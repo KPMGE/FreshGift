@@ -18,6 +18,7 @@ class DeleteGiftService implements DeleteGift {
 
 class DeleteGiftRepositoryMock implements DeleteGiftRepository {
   giftId: string;
+  callsCount = 0;
   output: Gift = {
     id: "any_gift_id",
     name: "any_gift_name",
@@ -27,6 +28,7 @@ class DeleteGiftRepositoryMock implements DeleteGiftRepository {
   };
 
   async delete(giftId: string): Promise<Gift> {
+    this.callsCount++;
     this.giftId = giftId;
     return this.output;
   }
@@ -59,16 +61,16 @@ describe("delete-gift", () => {
   it("should call delete repository with correct data.", async () => {
     const { sut, deleteRepository } = makeSut();
 
-    sut.execute(fakeGift.id);
+    await sut.execute(fakeGift.id);
 
     expect(deleteRepository.giftId).toBe(fakeGift.id);
   });
 
-  it("should return the deleted gift", async () => {
-    const { sut } = makeSut();
+  it("should call repository only once", async () => {
+    const { sut, deleteRepository } = makeSut();
 
-    const deletedGift = await sut.execute(fakeGift.id);
+    await sut.execute(fakeGift.id);
 
-    expect(deletedGift).toEqual(fakeGift);
+    expect(deleteRepository.callsCount).toBe(1);
   });
 });
