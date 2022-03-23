@@ -1,19 +1,6 @@
 import { Gift } from ".././../../../src/domain/entities";
-
-interface SaveGiftRepository {
-  save(gift: Gift): Promise<Gift>;
-}
-
-class SaveGiftRepositoryMock implements SaveGiftRepository {
-  input: Gift;
-  callsCount = 0;
-
-  async save(gift: Gift): Promise<Gift> {
-    this.input = gift;
-    this.callsCount++;
-    return gift;
-  }
-}
+import { SaveGiftRepository } from ".././../../../src/domain/repositories/gift";
+import { SaveGiftRepositoryMock } from "../../repositories/gift";
 
 interface CreateGift {
   execute(gift: Gift): Promise<Gift>;
