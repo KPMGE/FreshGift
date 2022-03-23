@@ -68,4 +68,12 @@ describe("create-gift", () => {
 
     expect(saveGiftRepository.callsCount).toBe(1);
   });
+
+  it("return created gift", async () => {
+    const { sut } = makeSut();
+
+    const createdGift = await sut.execute(gift);
+
+    expect(createdGift).toBe(gift);
+  });
 });
