@@ -1,10 +1,7 @@
 import { Gift } from ".././../../../src/domain/entities";
 import { SaveGiftRepository } from ".././../../../src/domain/repositories/gift";
 import { SaveGiftRepositoryMock } from "../../repositories/gift";
-
-interface CreateGift {
-  execute(gift: Gift): Promise<Gift>;
-}
+import { CreateGift } from "../../../../src/domain/useCases";
 
 class CreateGiftService implements CreateGift {
   constructor(private readonly saveGiftRepository: SaveGiftRepository) {}
@@ -19,7 +16,7 @@ type SutTypes = {
   saveGiftRepository: SaveGiftRepositoryMock;
 };
 
-const makeSut = () => {
+const makeSut = (): SutTypes => {
   const saveGiftRepository = new SaveGiftRepositoryMock();
   const sut = new CreateGiftService(saveGiftRepository);
 
