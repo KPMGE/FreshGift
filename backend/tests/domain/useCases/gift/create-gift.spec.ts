@@ -45,19 +45,27 @@ const makeSut = () => {
 };
 
 describe("create-gift", () => {
-  it("should call repository with correct data.", () => {
-    const gift = {
-      id: "1",
-      name: "gift",
-      price: 10,
-      description: "description",
-      image_url: "image_url",
-    };
+  const gift = {
+    id: "1",
+    name: "gift",
+    price: 10,
+    description: "description",
+    image_url: "image_url",
+  };
 
+  it("should call repository with correct data.", () => {
     const { sut, saveGiftRepository } = makeSut();
 
     sut.execute(gift);
 
     expect(saveGiftRepository.input).toBe(gift);
+  });
+
+  it("should call repository only once", () => {
+    const { sut, saveGiftRepository } = makeSut();
+
+    sut.execute(gift);
+
+    expect(saveGiftRepository.callsCount).toBe(1);
   });
 });
