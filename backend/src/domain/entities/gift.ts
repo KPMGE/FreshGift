@@ -3,5 +3,5 @@ export type Gift = {
   name: string;
   price: number;
   description: string;
-  image_url: string;
+  imageUrl: string;
 };

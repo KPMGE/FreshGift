@@ -1,15 +1,6 @@
-import { Gift } from ".././../../../src/domain/entities";
-import { SaveGiftRepository } from ".././../../../src/domain/repositories/gift";
 import { SaveGiftRepositoryMock } from "../../repositories/gift";
-import { CreateGift } from "../../../../src/domain/useCases";
-
-class CreateGiftService implements CreateGift {
-  constructor(private readonly saveGiftRepository: SaveGiftRepository) {}
-
-  async execute(gift: Gift): Promise<Gift> {
-    return this.saveGiftRepository.save(gift);
-  }
-}
+import { CreateGift } from "../../../../src/domain/useCases/gift";
+import { CreateGiftService } from "../../../../src/data/services/gift";
 
 type SutTypes = {
   sut: CreateGift;
