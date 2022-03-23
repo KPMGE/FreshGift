@@ -1,8 +1,5 @@
 import { Gift } from "../../../../../src/domain/entities";
-
-interface DeleteGift {
-  execute(giftId: string): Promise<Gift>;
-}
+import { DeleteGift } from "../../../../../src/domain/useCases/gift";
 
 interface DeleteGiftRepository {
   delete(giftId: string): Promise<Gift>;
@@ -16,7 +13,7 @@ class DeleteGiftService implements DeleteGift {
   }
 }
 
-class DeleteGiftRepositoryMock implements DeleteGiftRepository {
+class DeleteGiftRepositorySpy implements DeleteGiftRepository {
   giftId: string;
   callsCount = 0;
   output: Gift = {
@@ -36,11 +33,11 @@ class DeleteGiftRepositoryMock implements DeleteGiftRepository {
 
 type SutTypes = {
   sut: DeleteGift;
-  deleteRepository: DeleteGiftRepositoryMock;
+  deleteRepository: DeleteGiftRepositorySpy;
 };
 
 const makeSut = (): SutTypes => {
-  const deleteRepository = new DeleteGiftRepositoryMock();
+  const deleteRepository = new DeleteGiftRepositorySpy();
   const sut = new DeleteGiftService(deleteRepository);
 
   return {
