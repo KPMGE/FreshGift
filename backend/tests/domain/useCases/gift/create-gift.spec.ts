@@ -1,10 +1,4 @@
-type Gift = {
-  id: string;
-  name: string;
-  price: number;
-  description: string;
-  image_url: string;
-};
+import { Gift } from ".././../../../src/domain/entities";
 
 interface SaveGiftRepository {
   save(gift: Gift): Promise<Gift>;
