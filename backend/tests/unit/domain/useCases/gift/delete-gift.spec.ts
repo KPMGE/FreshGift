@@ -1,25 +1,6 @@
-import { Gift } from "../../../../../src/domain/entities";
 import { DeleteGift } from "../../../../../src/domain/useCases/gift";
-import { DeleteGiftRepository } from "../../../../../src/data/contracts/gift";
 import { DeleteGiftService } from "../../../../../src/data/services/gift";
-
-class DeleteGiftRepositorySpy implements DeleteGiftRepository {
-  giftId: string;
-  callsCount = 0;
-  output: Gift = {
-    id: "any_gift_id",
-    name: "any_gift_name",
-    description: "any_gift_description",
-    price: 0,
-    imageUrl: "any_gift_image",
-  };
-
-  async delete(giftId: string): Promise<Gift> {
-    this.callsCount++;
-    this.giftId = giftId;
-    return this.output;
-  }
-}
+import { DeleteGiftRepositorySpy } from "../../repositories/gift";
 
 type SutTypes = {
   sut: DeleteGift;
