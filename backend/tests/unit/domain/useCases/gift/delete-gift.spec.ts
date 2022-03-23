@@ -1,9 +1,6 @@
 import { Gift } from "../../../../../src/domain/entities";
 import { DeleteGift } from "../../../../../src/domain/useCases/gift";
-
-interface DeleteGiftRepository {
-  delete(giftId: string): Promise<Gift>;
-}
+import { DeleteGiftRepository } from "../../../../../src/data/contracts/gift";
 
 class DeleteGiftService implements DeleteGift {
   constructor(private readonly deleteRepository: DeleteGiftRepository) {}

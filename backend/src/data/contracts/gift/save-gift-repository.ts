@@ -1,5 +1,5 @@
-import { Gift } from "../../entities";
+import { GiftDTO } from "../../DTO";
 
 export interface SaveGiftRepository {
-  save(gift: Gift): Promise<Gift>;
+  save(gift: GiftDTO): Promise<GiftDTO>;
 }
