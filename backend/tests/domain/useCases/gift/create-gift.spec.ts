@@ -21,7 +21,11 @@ class SaveGiftRepositoryMock implements SaveGiftRepository {
   }
 }
 
-class CreateGift {
+interface CreateGift {
+  execute(gift: Gift): Promise<Gift>;
+}
+
+class CreateGiftService implements CreateGift {
   constructor(private readonly saveGiftRepository: SaveGiftRepository) {}
 
   async execute(gift: Gift): Promise<Gift> {
@@ -36,7 +40,7 @@ type SutTypes = {
 
 const makeSut = () => {
   const saveGiftRepository = new SaveGiftRepositoryMock();
-  const sut = new CreateGift(saveGiftRepository);
+  const sut = new CreateGiftService(saveGiftRepository);
 
   return {
     sut,
