@@ -1,14 +1,7 @@
 import { Gift } from "../../../../../src/domain/entities";
 import { DeleteGift } from "../../../../../src/domain/useCases/gift";
 import { DeleteGiftRepository } from "../../../../../src/data/contracts/gift";
-
-class DeleteGiftService implements DeleteGift {
-  constructor(private readonly deleteRepository: DeleteGiftRepository) {}
-
-  async execute(id: string): Promise<Gift> {
-    return this.deleteRepository.delete(id);
-  }
-}
+import { DeleteGiftService } from "../../../../../src/data/services/gift";
 
 class DeleteGiftRepositorySpy implements DeleteGiftRepository {
   giftId: string;
