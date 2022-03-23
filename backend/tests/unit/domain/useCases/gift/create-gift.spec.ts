@@ -1,6 +1,6 @@
 import { SaveGiftRepositoryMock } from "../../repositories/gift";
-import { CreateGift } from "../../../../src/domain/useCases/gift";
-import { CreateGiftService } from "../../../../src/data/services/gift";
+import { CreateGift } from "../../../../../src/domain/useCases/gift";
+import { CreateGiftService } from "../../../../../src/data/services/gift";
 
 type SutTypes = {
   sut: CreateGift;

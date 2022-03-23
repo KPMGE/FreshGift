@@ -1,5 +1,5 @@
-import { Gift } from ".././../../../src/domain/entities";
-import { SaveGiftRepository } from ".././../../../src/data/contracts/gift";
+import { Gift } from "../.././../../../src/domain/entities";
+import { SaveGiftRepository } from "../.././../../../src/data/contracts/gift";
 
 export class SaveGiftRepositoryMock implements SaveGiftRepository {
   input: Gift;
