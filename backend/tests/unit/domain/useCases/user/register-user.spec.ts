@@ -18,6 +18,10 @@ type UserDTO = {
   confirmPassword: string;
 };
 
+interface RegisterUser {
+  execute(user: UserDTO): Promise<void>;
+}
+
 class RegisterUserRepository {
   user?: UserDTO;
 
@@ -26,10 +30,11 @@ class RegisterUserRepository {
   }
 }
 
-class RegisterUser {
+class RegisterUserService implements RegisterUser {
   constructor(
     private readonly registerUserRepository: RegisterUserRepository
   ) {}
+
   async execute(user: UserDTO): Promise<void> {
     if (!user.name) throw new Error();
     if (!user.userName) throw new Error();
@@ -49,7 +54,7 @@ describe("register-user", () => {
 
   it("should call repository with the right data", async () => {
     const registerUserRepository = new RegisterUserRepository();
-    const sut = new RegisterUser(registerUserRepository);
+    const sut = new RegisterUserService(registerUserRepository);
 
     await sut.execute(fakeUser);
 
@@ -58,7 +63,7 @@ describe("register-user", () => {
 
   it("should throw and error if the name field is not filled in", async () => {
     const registerUserRepository = new RegisterUserRepository();
-    const sut = new RegisterUser(registerUserRepository);
+    const sut = new RegisterUserService(registerUserRepository);
 
     const promise = sut.execute({ ...fakeUser, name: "" });
 
@@ -67,7 +72,7 @@ describe("register-user", () => {
 
   it("should throw and error if the userName field is not filled in", async () => {
     const registerUserRepository = new RegisterUserRepository();
-    const sut = new RegisterUser(registerUserRepository);
+    const sut = new RegisterUserService(registerUserRepository);
 
     const promise = sut.execute({ ...fakeUser, userName: "" });
 
