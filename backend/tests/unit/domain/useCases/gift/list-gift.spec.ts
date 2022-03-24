@@ -1,9 +1,6 @@
 import { Gift } from "../../../../../src/domain/entities";
 import { ListGift } from "../../../../../src/domain/useCases/gift";
-
-interface ListGiftRepository {
-  list(): Promise<Gift[] | []>;
-}
+import { ListGiftRepository } from "../../../../../src/data/contracts/gift";
 
 class ListGiftService implements ListGift {
   constructor(private readonly listGiftRepository: ListGiftRepository) {}
