@@ -26,10 +26,23 @@ class ListGiftRepositorySpy implements ListGiftRepository {
   }
 }
 
+type SutTypes = {
+  sut: ListGift;
+  listGiftRepository: ListGiftRepositorySpy;
+};
+
+const makeSut = (): SutTypes => {
+  const listGiftRepository = new ListGiftRepositorySpy();
+  const sut = new ListGiftService(listGiftRepository);
+  return {
+    sut,
+    listGiftRepository,
+  };
+};
+
 describe("list-gift", () => {
   it("should return an empty array if there is no gift in the list", async () => {
-    const listGiftRepository = new ListGiftRepositorySpy();
-    const sut = new ListGiftService(listGiftRepository);
+    const { sut } = makeSut();
 
     const gifts = await sut.execute();
 
@@ -37,8 +50,7 @@ describe("list-gift", () => {
   });
 
   it("should call repository only once", async () => {
-    const listGiftRepository = new ListGiftRepositorySpy();
-    const sut = new ListGiftService(listGiftRepository);
+    const { sut, listGiftRepository } = makeSut();
 
     await sut.execute();
 
