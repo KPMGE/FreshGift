@@ -1,14 +1,7 @@
 import { Gift } from "../../../../../src/domain/entities";
 import { ListGift } from "../../../../../src/domain/useCases/gift";
 import { ListGiftRepository } from "../../../../../src/data/contracts/gift";
-
-class ListGiftService implements ListGift {
-  constructor(private readonly listGiftRepository: ListGiftRepository) {}
-
-  async execute(): Promise<Gift[]> {
-    return this.listGiftRepository.list();
-  }
-}
+import { ListGiftService } from "../../../../../src/data/services/gift";
 
 class ListGiftRepositorySpy implements ListGiftRepository {
   callsCount = 0;
