@@ -1,17 +1,6 @@
-import { Gift } from "../../../../../src/domain/entities";
 import { ListGift } from "../../../../../src/domain/useCases/gift";
-import { ListGiftRepository } from "../../../../../src/data/contracts/gift";
 import { ListGiftService } from "../../../../../src/data/services/gift";
-
-class ListGiftRepositorySpy implements ListGiftRepository {
-  callsCount = 0;
-  output: Gift[] = [];
-
-  async list(): Promise<Gift[]> {
-    this.callsCount++;
-    return this.output;
-  }
-}
+import { ListGiftRepositorySpy } from "../../repositories/gift";
 
 type SutTypes = {
   sut: ListGift;
