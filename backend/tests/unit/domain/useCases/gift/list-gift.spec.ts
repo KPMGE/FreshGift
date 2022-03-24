@@ -35,4 +35,13 @@ describe("list-gift", () => {
 
     expect(gifts).toEqual([]);
   });
+
+  it("should call repository only once", async () => {
+    const listGiftRepository = new ListGiftRepositorySpy();
+    const sut = new ListGiftService(listGiftRepository);
+
+    await sut.execute();
+
+    expect(listGiftRepository.callsCount).toBe(1);
+  });
 });
