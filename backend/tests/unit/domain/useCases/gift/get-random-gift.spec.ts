@@ -1,13 +1,15 @@
-import { GetRandomBookService } from "../../../../../src/data/services/gift/get-random-gift";
-import { GetRandomBookProviderStub } from "../../repositories/gift/get-random-gift";
+import { GetRandomGiftService } from "../../../../../src/data/services/gift";
+import { GetRandomGiftProviderStub } from "../../repositories/gift/get-random-gift";
 
 describe("get-random-gift", () => {
-  it("should return a random gift", async () => {
-    const getRandomGiftProvider = new GetRandomBookProviderStub();
-    const sut = new GetRandomBookService(getRandomGiftProvider);
+  it("should return a random gift inside the given range", async () => {
+    const getRandomGiftProvider = new GetRandomGiftProviderStub();
+    const sut = new GetRandomGiftService(getRandomGiftProvider);
 
-    const gift = await sut.execute();
+    const gift = await sut.execute({ min: 0, max: 100 });
 
+    expect(gift?.price).toBeGreaterThanOrEqual(0);
+    expect(gift?.price).toBeLessThanOrEqual(100);
     expect(gift).toBeTruthy();
     expect(gift).toHaveProperty("id");
     expect(gift).toHaveProperty("description");

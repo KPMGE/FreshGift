@@ -1,7 +1,7 @@
 import { GiftDTO } from "../../../../../src/data/DTO";
-import { GetRandomBookProvider } from "../../../../../src/data/providers/";
+import { GetRandomGiftProvider } from "../../../../../src/data/providers/";
 
-export class GetRandomBookProviderStub implements GetRandomBookProvider {
+export class GetRandomGiftProviderStub implements GetRandomGiftProvider {
   output: GiftDTO = {
     id: "any_gift_id",
     name: "gift",
