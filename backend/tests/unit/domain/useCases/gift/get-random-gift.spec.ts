@@ -1,6 +1,6 @@
 import { Gift } from "../../../../../src/domain/entities";
-import { GetRandomBook } from "../../../../../src/domain/useCases/gift";
 import { GetRandomBookProvider } from "../../../../../src/data/providers";
+import { GetRandomBookService } from "../../../../../src/data/services/gift/get-random-gift";
 
 class GetRandomBookProviderStub implements GetRandomBookProvider {
   output: Gift = {
@@ -13,14 +13,6 @@ class GetRandomBookProviderStub implements GetRandomBookProvider {
 
   async get(): Promise<Gift> {
     return this.output;
-  }
-}
-
-class GetRandomBookService implements GetRandomBook {
-  constructor(private readonly getRandomBookProvider: GetRandomBookProvider) {}
-
-  async execute(): Promise<Gift> {
-    return this.getRandomBookProvider.get();
   }
 }
 
