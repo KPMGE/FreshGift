@@ -2,7 +2,7 @@ import { GiftDTO } from "../../../../../src/data/DTO";
 import { DeleteGiftRepository } from "../../../../../src/data/contracts/gift";
 
 export class DeleteGiftRepositorySpy implements DeleteGiftRepository {
-  giftId: string;
+  giftId?: string;
   callsCount = 0;
   output: GiftDTO = {
     id: "any_gift_id",

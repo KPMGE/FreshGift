@@ -2,7 +2,7 @@ import { UpdateGiftRepository } from "../../../../../src/data/contracts/gift";
 import { GiftDTO } from "../../../../../src/data/DTO";
 
 export class UpdateGiftRepositorySpy implements UpdateGiftRepository {
-  giftId: string;
+  giftId?: string;
   callsCount: number = 0;
   output: GiftDTO = {
     id: "any_gift_id",
