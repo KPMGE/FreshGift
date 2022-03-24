@@ -1,20 +1,5 @@
-import { Gift } from "../../../../../src/domain/entities";
-import { GetRandomBookProvider } from "../../../../../src/data/providers";
 import { GetRandomBookService } from "../../../../../src/data/services/gift/get-random-gift";
-
-class GetRandomBookProviderStub implements GetRandomBookProvider {
-  output: Gift = {
-    id: "any_gift_id",
-    name: "gift",
-    price: 1,
-    imageUrl: "imageUrl",
-    description: "description",
-  };
-
-  async get(): Promise<Gift> {
-    return this.output;
-  }
-}
+import { GetRandomBookProviderStub } from "../../repositories/gift/get-random-gift";
 
 describe("get-random-gift", () => {
   it("should return a random gift", async () => {
