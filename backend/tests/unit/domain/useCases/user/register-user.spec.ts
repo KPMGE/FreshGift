@@ -22,7 +22,11 @@ interface RegisterUser {
   execute(user: UserDTO): Promise<void>;
 }
 
-class RegisterUserRepository {
+interface RegisterUserRepository {
+  register(user: UserDTO): Promise<void>;
+}
+
+class RegisterUserRepositorySpy implements RegisterUserRepository {
   user?: UserDTO;
 
   async register(user: UserDTO): Promise<void> {
@@ -45,11 +49,11 @@ class RegisterUserService implements RegisterUser {
 
 type SutTypes = {
   sut: RegisterUserService;
-  registerUserRepository: RegisterUserRepository;
+  registerUserRepository: RegisterUserRepositorySpy;
 };
 
 const makeSut = (): SutTypes => {
-  const registerUserRepository = new RegisterUserRepository();
+  const registerUserRepository = new RegisterUserRepositorySpy();
   const sut = new RegisterUserService(registerUserRepository);
 
   return {
