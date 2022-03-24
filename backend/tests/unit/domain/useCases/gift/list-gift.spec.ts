@@ -1,8 +1,5 @@
 import { Gift } from "../../../../../src/domain/entities";
-
-interface ListGift {
-  execute(): Promise<Gift[] | []>;
-}
+import { ListGift } from "../../../../../src/domain/useCases/gift";
 
 interface ListGiftRepository {
   list(): Promise<Gift[] | []>;
