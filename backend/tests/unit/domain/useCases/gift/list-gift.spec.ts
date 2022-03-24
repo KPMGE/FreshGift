@@ -56,4 +56,24 @@ describe("list-gift", () => {
 
     expect(listGiftRepository.callsCount).toBe(1);
   });
+
+  it("should return a valid list of gifts", async () => {
+    const fakeGiftList = [
+      {
+        id: "any_gift_id",
+        name: "any_name",
+        description: "any_description",
+        price: 10,
+        imageUrl: "any_url",
+      },
+    ];
+
+    const { sut, listGiftRepository } = makeSut();
+
+    listGiftRepository.output = fakeGiftList;
+
+    const gifts = await sut.execute();
+
+    expect(gifts).toEqual(fakeGiftList);
+  });
 });
