@@ -1,32 +1,6 @@
 import { Gift } from "../../../../../src/domain/entities";
-import { UpdateGift } from "../../../../../src/domain/useCases/gift";
-import { UpdateGiftRepository } from "../../../../../src/data/contracts/gift";
-
-class UpdateGiftRepositorySpy implements UpdateGiftRepository {
-  giftId: string;
-  callsCount: number = 0;
-  output: Gift = {
-    id: "any_gift_id",
-    name: "any_name",
-    description: "any_description",
-    price: 1,
-    imageUrl: "any_image",
-  };
-
-  async update(giftId: string): Promise<Gift> {
-    this.giftId = giftId;
-    this.callsCount++;
-    return this.output;
-  }
-}
-
-class UpdateGiftService implements UpdateGift {
-  constructor(private readonly updateGiftRepository: UpdateGiftRepository) {}
-
-  async execute(giftId: string): Promise<Gift> {
-    return await this.updateGiftRepository.update(giftId);
-  }
-}
+import { UpdateGiftService } from "../../../../../src/data/services/gift";
+import { UpdateGiftRepositorySpy } from "../../repositories/gift/";
 
 type SutTypes = {
   sut: UpdateGiftService;
