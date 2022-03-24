@@ -32,6 +32,7 @@ class RegisterUser {
   ) {}
   async execute(user: UserDTO): Promise<void> {
     if (!user.name) throw new Error();
+    if (!user.userName) throw new Error();
 
     this.registerUserRepository.register(user);
   }
@@ -60,6 +61,15 @@ describe("register-user", () => {
     const sut = new RegisterUser(registerUserRepository);
 
     const promise = sut.execute({ ...fakeUser, name: "" });
+
+    await expect(promise).rejects.toThrowError();
+  });
+
+  it("should throw and error if the userName field is not filled in", async () => {
+    const registerUserRepository = new RegisterUserRepository();
+    const sut = new RegisterUser(registerUserRepository);
+
+    const promise = sut.execute({ ...fakeUser, userName: "" });
 
     await expect(promise).rejects.toThrowError();
   });
