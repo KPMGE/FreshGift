@@ -43,6 +43,21 @@ class RegisterUserService implements RegisterUser {
   }
 }
 
+type SutTypes = {
+  sut: RegisterUserService;
+  registerUserRepository: RegisterUserRepository;
+};
+
+const makeSut = (): SutTypes => {
+  const registerUserRepository = new RegisterUserRepository();
+  const sut = new RegisterUserService(registerUserRepository);
+
+  return {
+    sut,
+    registerUserRepository,
+  };
+};
+
 describe("register-user", () => {
   const fakeUser: UserDTO = {
     name: "any_name",
@@ -53,8 +68,7 @@ describe("register-user", () => {
   };
 
   it("should call repository with the right data", async () => {
-    const registerUserRepository = new RegisterUserRepository();
-    const sut = new RegisterUserService(registerUserRepository);
+    const { sut, registerUserRepository } = makeSut();
 
     await sut.execute(fakeUser);
 
@@ -62,8 +76,7 @@ describe("register-user", () => {
   });
 
   it("should throw and error if the name field is not filled in", async () => {
-    const registerUserRepository = new RegisterUserRepository();
-    const sut = new RegisterUserService(registerUserRepository);
+    const { sut } = makeSut();
 
     const promise = sut.execute({ ...fakeUser, name: "" });
 
@@ -71,8 +84,7 @@ describe("register-user", () => {
   });
 
   it("should throw and error if the userName field is not filled in", async () => {
-    const registerUserRepository = new RegisterUserRepository();
-    const sut = new RegisterUserService(registerUserRepository);
+    const { sut } = makeSut();
 
     const promise = sut.execute({ ...fakeUser, userName: "" });
 
