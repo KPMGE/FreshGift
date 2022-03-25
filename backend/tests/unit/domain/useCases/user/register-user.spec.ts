@@ -19,7 +19,7 @@ type UserDTO = {
 };
 
 interface RegisterUser {
-  execute(user: UserDTO): Promise<void>;
+  execute(user: User): Promise<void>;
 }
 
 interface RegisterUserRepository {
@@ -33,38 +33,51 @@ class RandomIdGeneratorProvider {
 }
 
 class RegisterUserRepositorySpy implements RegisterUserRepository {
-  user?: UserDTO;
+  user?: User;
 
-  async register(user: UserDTO): Promise<void> {
+  async register(user: User): Promise<void> {
     this.user = user;
   }
 }
 
 class RegisterUserService implements RegisterUser {
   constructor(
-    private readonly registerUserRepository: RegisterUserRepository
+    private readonly registerUserRepository: RegisterUserRepository,
+    private readonly genereateIdProvider: RandomIdGeneratorProvider
   ) {}
 
   async execute(user: UserDTO): Promise<void> {
     if (!user.name) throw new Error();
     if (!user.userName) throw new Error();
+    const id = this.genereateIdProvider.generate();
 
-    this.registerUserRepository.register(user);
+    const newUser = {
+      ...user,
+      id,
+    };
+
+    this.registerUserRepository.register(newUser);
   }
 }
 
 type SutTypes = {
   sut: RegisterUserService;
   registerUserRepository: RegisterUserRepositorySpy;
+  genereateIdProvider: RandomIdGeneratorProvider;
 };
 
 const makeSut = (): SutTypes => {
   const registerUserRepository = new RegisterUserRepositorySpy();
-  const sut = new RegisterUserService(registerUserRepository);
+  const genereateIdProvider = new RandomIdGeneratorProvider();
+  const sut = new RegisterUserService(
+    registerUserRepository,
+    genereateIdProvider
+  );
 
   return {
     sut,
     registerUserRepository,
+    genereateIdProvider,
   };
 };
 
@@ -79,20 +92,23 @@ describe("register-user", () => {
 
   describe("id generator provider", () => {
     it("should return a valid id", () => {
-      const sut = new RandomIdGeneratorProvider();
+      const { genereateIdProvider } = makeSut();
 
-      const id = sut.generate();
+      const id = genereateIdProvider.generate();
 
       expect(id).toBeTruthy();
     });
   });
 
-  it("should call repository with the right data", async () => {
+  it("should generate an id to the user and pass it to the repository", async () => {
     const { sut, registerUserRepository } = makeSut();
 
     await sut.execute(fakeUser);
 
-    expect(registerUserRepository.user).toBe(fakeUser);
+    expect(registerUserRepository.user).toEqual({
+      ...fakeUser,
+      id: "any_valid_id",
+    });
   });
 
   it("should throw and error if the name field is not filled in", async () => {
