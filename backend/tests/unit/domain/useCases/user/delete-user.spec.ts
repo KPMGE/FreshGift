@@ -1,4 +1,12 @@
-class DeleteUserRepositoryMock {
+interface DeleteUserRepository {
+  delete(userId: string): Promise<void>;
+}
+
+interface DeleteUser {
+  execute(userId: string): Promise<void>;
+}
+
+class DeleteUserRepositoryMock implements DeleteUserRepository {
   input?: string;
 
   async delete(userId: string): Promise<void> {
@@ -6,10 +14,8 @@ class DeleteUserRepositoryMock {
   }
 }
 
-class DeleteUserService {
-  constructor(
-    private readonly deleteUserRepository: DeleteUserRepositoryMock
-  ) {}
+class DeleteUserService implements DeleteUser {
+  constructor(private readonly deleteUserRepository: DeleteUserRepository) {}
   async execute(userId: string): Promise<void> {
     this.deleteUserRepository.delete(userId);
   }
