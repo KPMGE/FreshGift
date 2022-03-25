@@ -59,6 +59,8 @@ class RegisterUserService implements RegisterUser {
     const isValidEmail = emailRegex.test(user.email);
     if (!isValidEmail) throw new Error();
 
+    if (user.password !== user.confirmPassword) throw new Error();
+
     const id = this.genereateIdProvider.generate();
     const newUser = {
       ...user,
@@ -164,6 +166,18 @@ describe("register-user", () => {
     const { sut } = makeSut();
 
     const promise = sut.execute({ ...fakeUser, email: "invalid_email" });
+
+    await expect(promise).rejects.toThrowError();
+  });
+
+  it("should throw and error password and confirmPassword don't match", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({
+      ...fakeUser,
+      password: "some_password",
+      confirmPassword: "other_password",
+    });
 
     await expect(promise).rejects.toThrowError();
   });
