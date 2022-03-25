@@ -26,7 +26,11 @@ interface RegisterUserRepository {
   register(user: UserDTO): Promise<void>;
 }
 
-class RandomIdGeneratorProvider {
+interface RandomIdGeneratorProvider {
+  generate(): string;
+}
+
+class RandomIdGeneratorProviderStub implements RandomIdGeneratorProvider {
   generate(): string {
     return "any_valid_id";
   }
@@ -79,7 +83,7 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const registerUserRepository = new RegisterUserRepositorySpy();
-  const genereateIdProvider = new RandomIdGeneratorProvider();
+  const genereateIdProvider = new RandomIdGeneratorProviderStub();
   const sut = new RegisterUserService(
     registerUserRepository,
     genereateIdProvider
