@@ -1,17 +1,8 @@
-import { User } from "../../../../../src/domain/entities";
 import { UserDTO } from "../../../../../src/data/DTO";
-import { RegisterUserRepository } from "../../../../../src/data/contracts/user";
 import { RandomIdGeneratorProvider } from "../../../../../src/data/providers";
 import { RegisterUserService } from "../../../../../src/data/services/user/register-user";
 import { RandomIdGeneratorProviderStub } from "../../providers";
-
-class RegisterUserRepositorySpy implements RegisterUserRepository {
-  user?: User;
-
-  async register(user: User): Promise<void> {
-    this.user = user;
-  }
-}
+import { RegisterUserRepositorySpy } from "../../repositories/user";
 
 type SutTypes = {
   sut: RegisterUserService;
