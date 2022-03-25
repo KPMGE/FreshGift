@@ -26,6 +26,12 @@ interface RegisterUserRepository {
   register(user: UserDTO): Promise<void>;
 }
 
+class RandomIdGeneratorProvider {
+  generate(): string {
+    return "any_valid_id";
+  }
+}
+
 class RegisterUserRepositorySpy implements RegisterUserRepository {
   user?: UserDTO;
 
@@ -70,6 +76,16 @@ describe("register-user", () => {
     password: "any_password",
     confirmPassword: "any_password",
   };
+
+  describe("id generator provider", () => {
+    it("should return a valid id", () => {
+      const sut = new RandomIdGeneratorProvider();
+
+      const id = sut.generate();
+
+      expect(id).toBeTruthy();
+    });
+  });
 
   it("should call repository with the right data", async () => {
     const { sut, registerUserRepository } = makeSut();
