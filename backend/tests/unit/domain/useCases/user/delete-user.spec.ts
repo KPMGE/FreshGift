@@ -1,12 +1,9 @@
 import { User } from "../../../../../src/domain/entities";
 import { MissingParameterError } from "../../../../../src/domain/errors";
+import { DeleteUser } from "../../../../../src/domain/useCases/user";
 
 interface DeleteUserRepository {
   delete(userId: string): Promise<User>;
-}
-
-interface DeleteUser {
-  execute(userId: string): Promise<User>;
 }
 
 class DeleteUserRepositorySpy implements DeleteUserRepository {
