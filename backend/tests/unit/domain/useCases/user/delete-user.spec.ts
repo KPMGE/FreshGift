@@ -1,3 +1,5 @@
+import { MissingParameterError } from "../../../../../src/domain/errors";
+
 interface DeleteUserRepository {
   delete(userId: string): Promise<void>;
 }
@@ -16,7 +18,12 @@ class DeleteUserRepositoryMock implements DeleteUserRepository {
 
 class DeleteUserService implements DeleteUser {
   constructor(private readonly deleteUserRepository: DeleteUserRepository) {}
+
   async execute(userId: string): Promise<void> {
+    if (!userId) {
+      throw new MissingParameterError("userId");
+    }
+
     this.deleteUserRepository.delete(userId);
   }
 }
@@ -43,5 +50,15 @@ describe("delete-user", () => {
     await sut.execute(userId);
 
     expect(deleteUserRepositoryMock.input).toBe(userId);
+  });
+
+  it("should throw an error if no userId is not provided", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute("");
+
+    await expect(promise).rejects.toThrowError(
+      new MissingParameterError("userId")
+    );
   });
 });
