@@ -1,14 +1,4 @@
-import { Gift } from "../../../../../src/domain/entities";
-
-type User = {
-  id: string;
-  name: string;
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-  savedGifts: Gift[];
-};
+import { User } from "../../../../../src/domain/entities";
 
 type UserDTO = {
   name: string;
