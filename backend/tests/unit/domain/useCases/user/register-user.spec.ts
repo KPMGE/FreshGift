@@ -49,8 +49,9 @@ class RegisterUserService implements RegisterUser {
   async execute(user: UserDTO): Promise<void> {
     if (!user.name) throw new Error();
     if (!user.userName) throw new Error();
-    const id = this.genereateIdProvider.generate();
+    if (!user.password) throw new Error();
 
+    const id = this.genereateIdProvider.generate();
     const newUser = {
       ...user,
       id,
@@ -123,6 +124,14 @@ describe("register-user", () => {
     const { sut } = makeSut();
 
     const promise = sut.execute({ ...fakeUser, userName: "" });
+
+    await expect(promise).rejects.toThrowError();
+  });
+
+  it("should throw and error if the password field is not filled in", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({ ...fakeUser, password: "" });
 
     await expect(promise).rejects.toThrowError();
   });
