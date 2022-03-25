@@ -1,4 +1,5 @@
 import { User } from "../../../../../src/domain/entities";
+import { RegisterUser } from "../../../../../src/domain/useCases/user";
 
 type UserDTO = {
   name: string;
@@ -7,10 +8,6 @@ type UserDTO = {
   password: string;
   confirmPassword: string;
 };
-
-interface RegisterUser {
-  execute(user: User): Promise<void>;
-}
 
 interface RegisterUserRepository {
   register(user: UserDTO): Promise<void>;
