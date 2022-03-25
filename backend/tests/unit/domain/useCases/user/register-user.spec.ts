@@ -1,6 +1,7 @@
 import { UserDTO } from "../../../../../src/data/DTO";
 import { RandomIdGeneratorProvider } from "../../../../../src/data/providers";
 import { RegisterUserService } from "../../../../../src/data/services/user/register-user";
+import { MissingParameterError } from "../../../../../src/domain/errors";
 import { RandomIdGeneratorProviderStub } from "../../providers";
 import { RegisterUserRepositorySpy } from "../../repositories/user";
 
@@ -60,7 +61,9 @@ describe("register-user", () => {
 
     const promise = sut.execute({ ...fakeUser, name: "" });
 
-    await expect(promise).rejects.toThrowError();
+    await expect(promise).rejects.toThrowError(
+      new MissingParameterError("name")
+    );
   });
 
   it("should throw and error if the userName field is not filled in", async () => {

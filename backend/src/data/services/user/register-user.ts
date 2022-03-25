@@ -2,6 +2,7 @@ import { RegisterUser } from "../../../domain/useCases/user";
 import { RegisterUserRepository } from "../../contracts/user";
 import { RandomIdGeneratorProvider } from "../../providers";
 import { UserDTO } from "../../DTO";
+import { MissingParameterError } from "../../../domain/errors";
 
 export class RegisterUserService implements RegisterUser {
   constructor(
@@ -10,7 +11,7 @@ export class RegisterUserService implements RegisterUser {
   ) {}
 
   async execute(user: UserDTO): Promise<void> {
-    if (!user.name) throw new Error();
+    if (!user.name) throw new MissingParameterError("name");
     if (!user.userName) throw new Error();
     if (!user.password) throw new Error();
     if (!user.confirmPassword) throw new Error();
