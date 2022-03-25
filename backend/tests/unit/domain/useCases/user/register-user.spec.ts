@@ -1,11 +1,8 @@
 import { User } from "../../../../../src/domain/entities";
-import { RegisterUser } from "../../../../../src/domain/useCases/user";
 import { UserDTO } from "../../../../../src/data/DTO";
 import { RegisterUserRepository } from "../../../../../src/data/contracts/user";
-
-interface RandomIdGeneratorProvider {
-  generate(): string;
-}
+import { RandomIdGeneratorProvider } from "../../../../../src/data/providers";
+import { RegisterUserService } from "../../../../../src/data/services/user/register-user";
 
 class RandomIdGeneratorProviderStub implements RandomIdGeneratorProvider {
   generate(): string {
@@ -18,37 +15,6 @@ class RegisterUserRepositorySpy implements RegisterUserRepository {
 
   async register(user: User): Promise<void> {
     this.user = user;
-  }
-}
-
-class RegisterUserService implements RegisterUser {
-  constructor(
-    private readonly registerUserRepository: RegisterUserRepository,
-    private readonly genereateIdProvider: RandomIdGeneratorProvider
-  ) {}
-
-  async execute(user: UserDTO): Promise<void> {
-    if (!user.name) throw new Error();
-    if (!user.userName) throw new Error();
-    if (!user.password) throw new Error();
-    if (!user.confirmPassword) throw new Error();
-    if (!user.email) throw new Error();
-
-    const emailRegex =
-      /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;
-
-    const isValidEmail = emailRegex.test(user.email);
-    if (!isValidEmail) throw new Error();
-
-    if (user.password !== user.confirmPassword) throw new Error();
-
-    const id = this.genereateIdProvider.generate();
-    const newUser = {
-      ...user,
-      id,
-    };
-
-    this.registerUserRepository.register(newUser);
   }
 }
 
