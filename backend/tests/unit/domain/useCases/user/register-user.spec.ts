@@ -1,17 +1,7 @@
 import { User } from "../../../../../src/domain/entities";
 import { RegisterUser } from "../../../../../src/domain/useCases/user";
-
-type UserDTO = {
-  name: string;
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-};
-
-interface RegisterUserRepository {
-  register(user: UserDTO): Promise<void>;
-}
+import { UserDTO } from "../../../../../src/data/DTO";
+import { RegisterUserRepository } from "../../../../../src/data/contracts/user";
 
 interface RandomIdGeneratorProvider {
   generate(): string;
