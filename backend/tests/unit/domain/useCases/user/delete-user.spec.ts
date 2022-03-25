@@ -1,20 +1,7 @@
-import { DeleteUserRepository } from "../../../../../src/data/contracts/user";
-import { User } from "../../../../../src/domain/entities";
+import { DeleteUserService } from "../../../../../src/data/services/user";
 import { MissingParameterError } from "../../../../../src/domain/errors";
 import { DeleteUser } from "../../../../../src/domain/useCases/user";
 import { DeleteUserRepositorySpy } from "../../repositories/user/delete-user";
-
-class DeleteUserService implements DeleteUser {
-  constructor(private readonly deleteUserRepository: DeleteUserRepository) {}
-
-  async execute(userId: string): Promise<User> {
-    if (!userId) {
-      throw new MissingParameterError("userId");
-    }
-
-    return this.deleteUserRepository.delete(userId);
-  }
-}
 
 type SutTypes = {
   sut: DeleteUser;
