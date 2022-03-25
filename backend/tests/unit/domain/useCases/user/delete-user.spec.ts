@@ -21,15 +21,27 @@ class DeleteUserService implements DeleteUser {
   }
 }
 
+type SutTypes = {
+  sut: DeleteUser;
+  deleteUserRepositoryMock: DeleteUserRepositoryMock;
+};
+
+const makeSut = (): SutTypes => {
+  const deleteUserRepositoryMock = new DeleteUserRepositoryMock();
+  const sut = new DeleteUserService(deleteUserRepositoryMock);
+  return {
+    sut,
+    deleteUserRepositoryMock,
+  };
+};
+
 describe("delete-user", () => {
   it("should call repository with right userId", async () => {
+    const { sut, deleteUserRepositoryMock } = makeSut();
     const userId = "any_user_id";
-
-    const deleteUserRepo = new DeleteUserRepositoryMock();
-    const sut = new DeleteUserService(deleteUserRepo);
 
     await sut.execute(userId);
 
-    expect(deleteUserRepo.input).toBe(userId);
+    expect(deleteUserRepositoryMock.input).toBe(userId);
   });
 });
