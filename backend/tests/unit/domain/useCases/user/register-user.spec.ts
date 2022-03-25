@@ -3,12 +3,7 @@ import { UserDTO } from "../../../../../src/data/DTO";
 import { RegisterUserRepository } from "../../../../../src/data/contracts/user";
 import { RandomIdGeneratorProvider } from "../../../../../src/data/providers";
 import { RegisterUserService } from "../../../../../src/data/services/user/register-user";
-
-class RandomIdGeneratorProviderStub implements RandomIdGeneratorProvider {
-  generate(): string {
-    return "any_valid_id";
-  }
-}
+import { RandomIdGeneratorProviderStub } from "../../providers";
 
 class RegisterUserRepositorySpy implements RegisterUserRepository {
   user?: User;
