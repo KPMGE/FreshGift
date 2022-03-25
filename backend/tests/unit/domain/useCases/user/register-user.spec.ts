@@ -50,6 +50,8 @@ class RegisterUserService implements RegisterUser {
     if (!user.name) throw new Error();
     if (!user.userName) throw new Error();
     if (!user.password) throw new Error();
+    if (!user.confirmPassword) throw new Error();
+    if (!user.email) throw new Error();
 
     const id = this.genereateIdProvider.generate();
     const newUser = {
@@ -132,6 +134,22 @@ describe("register-user", () => {
     const { sut } = makeSut();
 
     const promise = sut.execute({ ...fakeUser, password: "" });
+
+    await expect(promise).rejects.toThrowError();
+  });
+
+  it("should throw and error if the confirmPassword field is not filled in", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({ ...fakeUser, confirmPassword: "" });
+
+    await expect(promise).rejects.toThrowError();
+  });
+
+  it("should throw and error if the email field is not filled in", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({ ...fakeUser, confirmPassword: "" });
 
     await expect(promise).rejects.toThrowError();
   });
