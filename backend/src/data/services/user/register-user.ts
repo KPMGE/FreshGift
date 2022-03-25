@@ -12,10 +12,11 @@ export class RegisterUserService implements RegisterUser {
 
   async execute(user: UserDTO): Promise<void> {
     if (!user.name) throw new MissingParameterError("name");
-    if (!user.userName) throw new Error();
-    if (!user.password) throw new Error();
-    if (!user.confirmPassword) throw new Error();
-    if (!user.email) throw new Error();
+    if (!user.userName) throw new MissingParameterError("userName");
+    if (!user.password) throw new MissingParameterError("password");
+    if (!user.confirmPassword)
+      throw new MissingParameterError("confirmPassword");
+    if (!user.email) throw new MissingParameterError("email");
 
     const emailRegex =
       /^(([^<>()\[\]\\.,;:\s@"]+(\.[^<>()\[\]\\.,;:\s@"]+)*)|(".+"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$/;

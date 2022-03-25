@@ -71,7 +71,9 @@ describe("register-user", () => {
 
     const promise = sut.execute({ ...fakeUser, userName: "" });
 
-    await expect(promise).rejects.toThrowError();
+    await expect(promise).rejects.toThrowError(
+      new MissingParameterError("userName")
+    );
   });
 
   it("should throw and error if the password field is not filled in", async () => {
@@ -79,7 +81,9 @@ describe("register-user", () => {
 
     const promise = sut.execute({ ...fakeUser, password: "" });
 
-    await expect(promise).rejects.toThrowError();
+    await expect(promise).rejects.toThrowError(
+      new MissingParameterError("password")
+    );
   });
 
   it("should throw and error if the confirmPassword field is not filled in", async () => {
@@ -87,15 +91,19 @@ describe("register-user", () => {
 
     const promise = sut.execute({ ...fakeUser, confirmPassword: "" });
 
-    await expect(promise).rejects.toThrowError();
+    await expect(promise).rejects.toThrowError(
+      new MissingParameterError("confirmPassword")
+    );
   });
 
   it("should throw and error if the email field is not filled in", async () => {
     const { sut } = makeSut();
 
-    const promise = sut.execute({ ...fakeUser, confirmPassword: "" });
+    const promise = sut.execute({ ...fakeUser, email: "" });
 
-    await expect(promise).rejects.toThrowError();
+    await expect(promise).rejects.toThrowError(
+      new MissingParameterError("email")
+    );
   });
 
   it("should throw and error if the email field is invalid", async () => {
