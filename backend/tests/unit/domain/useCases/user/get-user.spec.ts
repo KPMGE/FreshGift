@@ -22,12 +22,26 @@ class GetUserService implements GetUser {
   }
 }
 
+type SutTypes = {
+  sut: GetUserService,
+  getUserRepositoryMock: GetUserRepositoryMock
+}
+
+const makeSut = (): SutTypes => {
+  const getUserRepositoryMock = new GetUserRepositoryMock()
+  const sut = new GetUserService(getUserRepositoryMock)
+
+  return {
+    sut,
+    getUserRepositoryMock
+  }
+}
+
 describe('get-user', () => {
   const userId = 'any_user_id'
 
   it('should call repository with right id', async () => {
-    const getUserRepositoryMock = new GetUserRepositoryMock()
-    const sut = new GetUserService(getUserRepositoryMock)
+    const { sut, getUserRepositoryMock } = makeSut()
 
     await sut.execute(userId)
 
