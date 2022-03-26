@@ -1,4 +1,12 @@
-class GetUserRepositoryMock {
+interface GetUser {
+  execute(userId: string): Promise<void>
+}
+
+interface GetUserRepository {
+  get(userId: string): Promise<void>
+}
+
+class GetUserRepositoryMock implements GetUserRepository {
   userId: string = 'any_user_id'
 
   async get(userId: string): Promise<void> {
@@ -6,7 +14,7 @@ class GetUserRepositoryMock {
   }
 }
 
-class GetUserService {
+class GetUserService implements GetUser {
   constructor(private readonly getUserRepository: GetUserRepositoryMock) { }
 
   async execute(userId: string): Promise<void> {
