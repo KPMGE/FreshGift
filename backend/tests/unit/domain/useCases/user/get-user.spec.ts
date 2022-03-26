@@ -1,7 +1,7 @@
 import { GetUserRepository } from "../../../../../src/data/contracts/user"
+import { GetUserService } from "../../../../../src/data/services/user/get-user"
 import { User } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
-import { GetUser } from "../../../../../src/domain/useCases/user"
 
 class GetUserRepositorySpy implements GetUserRepository {
   userId: string = 'any_user_id'
@@ -18,15 +18,6 @@ class GetUserRepositorySpy implements GetUserRepository {
   async get(userId: string): Promise<User> {
     this.userId = userId
     return this.output
-  }
-}
-
-class GetUserService implements GetUser {
-  constructor(private readonly getUserRepository: GetUserRepositorySpy) { }
-
-  async execute(userId: string): Promise<User> {
-    if (!userId) throw new MissingParameterError('userId')
-    return this.getUserRepository.get(userId)
   }
 }
 
