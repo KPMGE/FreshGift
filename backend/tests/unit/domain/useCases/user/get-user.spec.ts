@@ -1,4 +1,5 @@
 import { User } from "../../../../../src/domain/entities"
+import { MissingParameterError } from "../../../../../src/domain/errors"
 
 interface GetUser {
   execute(userId: string): Promise<User>
@@ -30,6 +31,7 @@ class GetUserService implements GetUser {
   constructor(private readonly getUserRepository: GetUserRepositorySpy) { }
 
   async execute(userId: string): Promise<User> {
+    if (!userId) throw new MissingParameterError('userId')
     return this.getUserRepository.get(userId)
   }
 }
@@ -75,5 +77,14 @@ describe('get-user', () => {
     const user = await sut.execute(fakeUser.id)
 
     expect(getUserRepositorySpy.output).toBe(user)
+  })
+
+
+  it('should throw an error if no userId is provided', async () => {
+    const { sut } = makeSut()
+
+    const promise = sut.execute('')
+
+    await expect(promise).rejects.toThrowError(new MissingParameterError('userId'))
   })
 })
