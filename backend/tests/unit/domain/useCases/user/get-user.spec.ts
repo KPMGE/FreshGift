@@ -1,11 +1,7 @@
+import { GetUserRepository } from "../../../../../src/data/contracts/user"
 import { User } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
 import { GetUser } from "../../../../../src/domain/useCases/user"
-
-
-interface GetUserRepository {
-  get(userId: string): Promise<User>
-}
 
 class GetUserRepositorySpy implements GetUserRepository {
   userId: string = 'any_user_id'
@@ -68,7 +64,6 @@ describe('get-user', () => {
     expect(getUserRepositorySpy.userId).toBe(fakeUser.id)
   })
 
-
   it('should return a valid user', async () => {
     const { sut, getUserRepositorySpy } = makeSut()
 
@@ -76,7 +71,6 @@ describe('get-user', () => {
 
     expect(getUserRepositorySpy.output).toBe(user)
   })
-
 
   it('should throw an error if no userId is provided', async () => {
     const { sut } = makeSut()
