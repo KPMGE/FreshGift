@@ -1,9 +1,7 @@
 import { User } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
+import { GetUser } from "../../../../../src/domain/useCases/user"
 
-interface GetUser {
-  execute(userId: string): Promise<User>
-}
 
 interface GetUserRepository {
   get(userId: string): Promise<User>
