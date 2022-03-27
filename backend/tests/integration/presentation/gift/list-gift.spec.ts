@@ -1,3 +1,4 @@
+import { GiftDTO } from "../../../../src/data/DTO"
 import { ListGiftService } from "../../../../src/data/services/gift"
 import { ListGift } from "../../../../src/domain/useCases/gift"
 import { FakeListGiftRepository } from "../../../../src/infra/repositories"
@@ -18,11 +19,25 @@ class ListGiftController implements Controller {
   }
 }
 
+type SutTypes = {
+
+  sut: ListGiftController
+}
+
+const makeSut = (): SutTypes => {
+
+  const listGiftRepository = new FakeListGiftRepository()
+  const listGiftService = new ListGiftService(listGiftRepository)
+  const sut = new ListGiftController(listGiftService)
+
+  return {
+    sut
+  }
+}
+
 describe('list-gifts', () => {
   it('should return an empty array if no there is no saved gift', async () => {
-    const listGiftRepository = new FakeListGiftRepository()
-    const listGiftService = new ListGiftService(listGiftRepository)
-    const sut = new ListGiftController(listGiftService)
+    const { sut } = makeSut()
 
     const response = await sut.handle()
 
