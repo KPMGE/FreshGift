@@ -3,7 +3,7 @@ import { GetGiftByIdService } from "../../../../src/data/services/gift"
 import { MissingParameterError } from "../../../../src/domain/errors"
 import { GetGiftById } from "../../../../src/domain/useCases/gift"
 import { FakeGetGiftByIdRepository, FakeSaveGiftRepository } from "../../../../src/infra/repositories"
-import { HttpRequest, HttpResponse, resourceNotFoundError, serverError } from "../../../../src/presentation/contracts"
+import { HttpRequest, HttpResponse, ok, resourceNotFoundError, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 import { GiftViewModel } from "../../../../src/presentation/view-models"
 
@@ -14,7 +14,7 @@ class GetGiftByIdController implements Controller {
     try {
       const foundGift = await this.getGiftByIdService.execute(req?.body?.giftId)
       if (!foundGift) return resourceNotFoundError('gift')
-      return foundGift
+      return ok(foundGift)
     } catch (error) {
       return serverError(error as Error)
     }
@@ -44,12 +44,6 @@ describe('get-gift-by-id', () => {
     description: 'any_description'
   }
 
-  beforeAll(async () => {
-    // add a gift to the repository
-    const saveGiftRepository = new FakeSaveGiftRepository()
-    await saveGiftRepository.save(fakeGift)
-  })
-
   it('should return resourceNotFoundError no gift is found', async () => {
     const { sut } = makeSut()
 
@@ -67,5 +61,18 @@ describe('get-gift-by-id', () => {
 
     expect(response.statusCode).toBe(500)
     expect(response.data).toBe(new MissingParameterError('giftId').message)
+  })
+
+  it('should return the right gift', async () => {
+    // save fakeGift in the fakeGiftRepository
+    const saveGiftRepository = new FakeSaveGiftRepository()
+    await saveGiftRepository.save(fakeGift)
+
+    const { sut } = makeSut()
+
+    const gift = await sut.handle({ body: { giftId: fakeGift.id } })
+
+    expect(gift.statusCode).toBe(200)
+    expect(gift.data).toEqual(fakeGift)
   })
 })
