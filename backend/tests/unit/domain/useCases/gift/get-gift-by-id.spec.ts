@@ -1,5 +1,7 @@
+import { MissingParameterError } from "../../../../../src/domain/errors"
+
 interface GetGiftById {
-  execute(giftId: string): Promise<void>
+  execute(giftId?: string): Promise<void>
 }
 
 interface GetGiftByIdRepository {
@@ -17,7 +19,8 @@ class GetGiftByIdRepositoryMock implements GetGiftByIdRepository {
 class GetGiftByIdService implements GetGiftById {
   constructor(private readonly getGiftBydIdRepository: GetGiftByIdRepository) { }
 
-  async execute(giftId: string): Promise<void> {
+  async execute(giftId?: string): Promise<void> {
+    if (!giftId) throw new MissingParameterError('giftId')
     await this.getGiftBydIdRepository.getGift(giftId)
   }
 }
@@ -47,6 +50,14 @@ describe('get-gift-by-id', () => {
     await sut.execute(fakeGiftId)
 
     expect(getGiftByIdRepository.input).toBe(fakeGiftId)
+  })
 
+
+  it('should throw an error if no valid id is provided', async () => {
+    const { sut } = makeSut()
+
+    const promise = sut.execute(undefined)
+
+    await expect(promise).rejects.toThrowError(new MissingParameterError('giftId'))
   })
 })
