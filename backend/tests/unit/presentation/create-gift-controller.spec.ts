@@ -17,14 +17,23 @@ interface Controller {
   handle(req?: HttpRequest): Promise<HttpResponse>
 }
 
+const serverError = (error: Error): HttpResponse => {
+  return {
+    statusCode: 500,
+    data: error.message || "Unexpected error"
+  }
+}
+
 class CreateGiftController implements Controller {
   constructor(private readonly createGiftService: CreateGift) { }
 
   async handle(req?: HttpRequest<any>): Promise<HttpResponse<Gift>> {
-    if (!req) throw new MissingParameterError('request')
-    if (!req.body) throw new MissingParameterError('request.body')
-
-    return this.createGiftService.execute(req?.body)
+    try {
+      const createdGift = await this.createGiftService.execute(req?.body)
+      return createdGift
+    } catch (error) {
+      return serverError(error as Error)
+    }
   }
 }
 
@@ -59,20 +68,11 @@ describe('create-gift-controller', () => {
     body: fakeGift
   }
 
-  it('should throw an error if no request is provided', async () => {
+  it('should return serverError if createGiftService throws', async () => {
     const { sut } = makeSut()
 
-    const promise = sut.handle()
+    const promise = sut.handle({})
 
     await expect(promise).rejects.toThrowError(new MissingParameterError('request'))
-  })
-
-  it('should throw an error if no request body is provided', async () => {
-    const { sut } = makeSut()
-
-    fakeRequest.body = undefined
-    const promise = sut.handle(fakeRequest)
-
-    await expect(promise).rejects.toThrowError(new MissingParameterError('request.body'))
   })
 })

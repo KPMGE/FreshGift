@@ -1,6 +1,7 @@
 import { SaveGiftRepositoryMock } from "../../repositories/gift";
 import { CreateGift } from "../../../../../src/domain/useCases/gift";
 import { CreateGiftService } from "../../../../../src/data/services/gift";
+import { MissingParameterError } from "../../../../../src/domain/errors";
 
 type SutTypes = {
   sut: CreateGift;
@@ -23,8 +24,48 @@ describe("create-gift", () => {
     name: "gift",
     price: 10,
     description: "description",
-    image_url: "image_url",
+    imageUrl: "image_url",
   };
+
+  it("should throw error if no gift is provided", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute(undefined);
+
+    expect(promise).rejects.toThrowError(new MissingParameterError('gift'));
+  });
+
+  it("should throw error if no gift id is provided", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({ ...gift, id: undefined });
+
+    expect(promise).rejects.toThrowError(new MissingParameterError('gift.id'));
+  });
+
+  it("should throw error if no gift name is provided", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({ ...gift, name: undefined });
+
+    expect(promise).rejects.toThrowError(new MissingParameterError('gift.name'));
+  });
+
+  it("should throw error if no gift description is provided", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({ ...gift, description: undefined });
+
+    expect(promise).rejects.toThrowError(new MissingParameterError('gift.description'));
+  });
+
+  it("should throw error if no gift imageUrl is provided", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute({ ...gift, imageUrl: undefined });
+
+    expect(promise).rejects.toThrowError(new MissingParameterError('gift.imageUrl'));
+  });
 
   it("should call repository with correct data.", () => {
     const { sut, saveGiftRepository } = makeSut();
