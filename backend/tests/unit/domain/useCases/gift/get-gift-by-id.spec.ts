@@ -1,13 +1,7 @@
+import { GetGiftByIdRepository } from "../../../../../src/data/contracts/gift/get-gift-by-id-repository"
+import { GetGiftByIdService } from "../../../../../src/data/services/gift"
 import { Gift } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
-
-interface GetGiftById {
-  execute(giftId?: string): Promise<Gift | null>
-}
-
-interface GetGiftByIdRepository {
-  getGift(giftId: string): Promise<Gift | undefined>
-}
 
 class GetGiftByIdRepositoryMock implements GetGiftByIdRepository {
   input?: string
@@ -22,20 +16,6 @@ class GetGiftByIdRepositoryMock implements GetGiftByIdRepository {
   async getGift(giftId: string): Promise<Gift | undefined> {
     this.input = giftId
     return this.output;
-  }
-}
-
-class GetGiftByIdService implements GetGiftById {
-  constructor(private readonly getGiftBydIdRepository: GetGiftByIdRepository) { }
-
-  async execute(giftId?: string): Promise<Gift | null> {
-    if (!giftId) throw new MissingParameterError('giftId')
-
-    const foundGift = await this.getGiftBydIdRepository.getGift(giftId)
-
-    if (!foundGift) return null
-
-    return foundGift
   }
 }
 
