@@ -46,4 +46,13 @@ describe("update-gift", () => {
 
     expect(updateGiftRepository.callsCount).toEqual(1);
   });
+
+  it("should return null if no gift is found", async () => {
+    const { sut, updateGiftRepository } = makeSut();
+    updateGiftRepository.output = undefined
+
+    const foundGift = await sut.execute(fakeGift.id);
+
+    expect(foundGift).toBeNull();
+  });
 });

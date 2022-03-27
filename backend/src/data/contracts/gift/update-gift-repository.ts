@@ -1,5 +1,5 @@
 import { GiftDTO } from "../../DTO";
 
 export interface UpdateGiftRepository {
-  update(giftId: string): Promise<GiftDTO>;
+  update(giftId: string): Promise<GiftDTO | undefined>;
 }

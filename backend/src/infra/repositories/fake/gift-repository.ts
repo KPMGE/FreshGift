@@ -1,4 +1,4 @@
-import { ListGiftRepository, SaveGiftRepository } from '../../../data/contracts/gift'
+import { ListGiftRepository, SaveGiftRepository, UpdateGiftRepository } from '../../../data/contracts/gift'
 import { GetGiftByIdRepository } from '../../../data/contracts/gift/get-gift-by-id-repository'
 import { DeleteUserRepository } from '../../../data/contracts/user'
 import { GiftDTO } from '../../../data/DTO'
@@ -37,5 +37,12 @@ export class FakeListGiftRepository implements ListGiftRepository {
 export class FakeGetGiftByIdRepository implements GetGiftByIdRepository {
   async getGift(giftId: string): Promise<GiftDTO | undefined> {
     return listGifts.find(gift => gift.id === giftId)
+  }
+}
+
+export class FakeUpdateGiftRepository implements UpdateGiftRepository {
+  async update(giftId: string): Promise<GiftDTO | null> {
+    const foundGift = listGifts.find(gift => gift.id === giftId)
+    return foundGift
   }
 }
