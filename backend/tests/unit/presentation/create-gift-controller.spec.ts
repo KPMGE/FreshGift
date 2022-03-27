@@ -24,13 +24,20 @@ const serverError = (error: Error): HttpResponse => {
   }
 }
 
+const ok = (data: any): HttpResponse => {
+  return {
+    statusCode: 200,
+    data
+  }
+}
+
 class CreateGiftController implements Controller {
   constructor(private readonly createGiftService: CreateGift) { }
 
   async handle(req?: HttpRequest<any>): Promise<HttpResponse<Gift>> {
     try {
       const createdGift = await this.createGiftService.execute(req?.body)
-      return createdGift
+      return ok(createdGift)
     } catch (error) {
       return serverError(error as Error)
     }
@@ -74,5 +81,14 @@ describe('create-gift-controller', () => {
     const output = await sut.handle({})
 
     expect(output).toEqual(serverError(new MissingParameterError('gift')))
+  })
+
+  it('should return ok with the saved gift', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle(fakeRequest)
+
+    expect(response).toBeTruthy()
+    expect(response.data).toEqual(fakeGift)
   })
 })
