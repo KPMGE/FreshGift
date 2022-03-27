@@ -1,23 +1,9 @@
 import { CreateGiftService } from "../../../src/data/services/gift"
 import { MissingParameterError } from "../../../src/domain/errors"
-import { CreateGift } from "../../../src/domain/useCases/gift"
-import { HttpRequest, HttpResponse, ok, serverError } from "../../../src/presentation/contracts"
-import { Controller } from "../../../src/presentation/contracts/controller"
+import { HttpRequest, serverError } from "../../../src/presentation/contracts"
+import { CreateGiftController } from "../../../src/presentation/controllers"
 import { GiftViewModel } from "../../../src/presentation/view-models"
 import { SaveGiftRepositoryMock } from "../domain/repositories/gift"
-
-class CreateGiftController implements Controller {
-  constructor(private readonly createGiftService: CreateGift) { }
-
-  async handle(req?: HttpRequest<any>): Promise<HttpResponse<GiftViewModel>> {
-    try {
-      const createdGift = await this.createGiftService.execute(req?.body)
-      return ok(createdGift)
-    } catch (error) {
-      return serverError(error as Error)
-    }
-  }
-}
 
 type SutTypes = {
   sut: CreateGiftController,
