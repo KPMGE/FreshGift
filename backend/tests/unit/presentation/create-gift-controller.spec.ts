@@ -71,8 +71,8 @@ describe('create-gift-controller', () => {
   it('should return serverError if createGiftService throws', async () => {
     const { sut } = makeSut()
 
-    const promise = sut.handle({})
+    const output = await sut.handle({})
 
-    await expect(promise).rejects.toThrowError(new MissingParameterError('request'))
+    expect(output).toEqual(serverError(new MissingParameterError('gift')))
   })
 })
