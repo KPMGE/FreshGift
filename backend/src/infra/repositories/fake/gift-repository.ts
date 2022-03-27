@@ -41,7 +41,7 @@ export class FakeGetGiftByIdRepository implements GetGiftByIdRepository {
 }
 
 export class FakeUpdateGiftRepository implements UpdateGiftRepository {
-  async update(giftId: string): Promise<GiftDTO | null> {
+  async update(giftId?: string): Promise<GiftDTO | undefined> {
     const foundGift = listGifts.find(gift => gift.id === giftId)
     return foundGift
   }
