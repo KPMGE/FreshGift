@@ -1,6 +1,7 @@
-import { SaveGiftRepository } from '../../../data/contracts/gift'
+import { ListGiftRepository, SaveGiftRepository } from '../../../data/contracts/gift'
 import { DeleteUserRepository } from '../../../data/contracts/user'
 import { Gift } from '../../../domain/entities'
+import { GiftViewModel } from '../../../presentation/view-models'
 
 let listGifts: Gift[] = []
 
@@ -24,3 +25,10 @@ export class FakeDeleteGiftRepository implements DeleteUserRepository {
     return foundGift
   }
 }
+
+export class FakeListGiftRepository implements ListGiftRepository {
+  async list(): Promise<GiftViewModel[]> {
+    return listGifts
+  }
+}
+
