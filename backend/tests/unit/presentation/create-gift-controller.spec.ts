@@ -1,8 +1,10 @@
+import { GiftDTO } from "../../../src/data/DTO"
 import { CreateGiftService } from "../../../src/data/services/gift"
-import { Gift } from "../../../src/domain/entities"
 import { MissingParameterError } from "../../../src/domain/errors"
 import { CreateGift } from "../../../src/domain/useCases/gift"
 import { SaveGiftRepositoryMock } from "../domain/repositories/gift"
+
+type GiftViewModel = GiftDTO
 
 interface HttpResponse<T = any> {
   statusCode: number
@@ -34,7 +36,7 @@ const ok = (data: any): HttpResponse => {
 class CreateGiftController implements Controller {
   constructor(private readonly createGiftService: CreateGift) { }
 
-  async handle(req?: HttpRequest<any>): Promise<HttpResponse<Gift>> {
+  async handle(req?: HttpRequest<any>): Promise<HttpResponse<GiftViewModel>> {
     try {
       const createdGift = await this.createGiftService.execute(req?.body)
       return ok(createdGift)
@@ -63,7 +65,7 @@ const makeSut = (): SutTypes => {
 }
 
 describe('create-gift-controller', () => {
-  const fakeGift: Gift = {
+  const fakeGift: GiftViewModel = {
     id: 'some_gift_id',
     name: 'some_gift_name',
     price: 100,
@@ -71,7 +73,7 @@ describe('create-gift-controller', () => {
     description: 'some_description'
   }
 
-  const fakeRequest: HttpRequest<Gift> = {
+  const fakeRequest: HttpRequest<GiftViewModel> = {
     body: fakeGift
   }
 
