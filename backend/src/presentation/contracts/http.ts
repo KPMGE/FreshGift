@@ -6,3 +6,18 @@ export interface HttpResponse<T = any> {
 export interface HttpRequest<T = any> {
   body?: T
 }
+
+
+export const serverError = (error: Error): HttpResponse => {
+  return {
+    statusCode: 500,
+    data: error.message || "Unexpected error"
+  }
+}
+
+export const ok = (data: any): HttpResponse => {
+  return {
+    statusCode: 200,
+    data
+  }
+}

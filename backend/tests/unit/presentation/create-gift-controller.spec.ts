@@ -1,24 +1,10 @@
 import { CreateGiftService } from "../../../src/data/services/gift"
 import { MissingParameterError } from "../../../src/domain/errors"
 import { CreateGift } from "../../../src/domain/useCases/gift"
-import { HttpRequest, HttpResponse } from "../../../src/presentation/contracts"
+import { HttpRequest, HttpResponse, ok, serverError } from "../../../src/presentation/contracts"
 import { Controller } from "../../../src/presentation/contracts/controller"
 import { GiftViewModel } from "../../../src/presentation/view-models"
 import { SaveGiftRepositoryMock } from "../domain/repositories/gift"
-
-const serverError = (error: Error): HttpResponse => {
-  return {
-    statusCode: 500,
-    data: error.message || "Unexpected error"
-  }
-}
-
-const ok = (data: any): HttpResponse => {
-  return {
-    statusCode: 200,
-    data
-  }
-}
 
 class CreateGiftController implements Controller {
   constructor(private readonly createGiftService: CreateGift) { }
