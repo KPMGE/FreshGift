@@ -1,27 +1,48 @@
+import { Gift } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
 
+class GiftNotFoundError extends Error {
+  constructor() {
+    super('Gift not found!')
+    this.name = 'GiftNotFoundError '
+  }
+}
+
 interface GetGiftById {
-  execute(giftId?: string): Promise<void>
+  execute(giftId?: string): Promise<Gift | undefined>
 }
 
 interface GetGiftByIdRepository {
-  getGift(giftId: string): Promise<void>
+  getGift(giftId: string): Promise<Gift | undefined>
 }
 
 class GetGiftByIdRepositoryMock implements GetGiftByIdRepository {
   input?: string
+  output?: Gift = {
+    id: 'any_gift_id',
+    name: 'any_gift_name',
+    price: 100,
+    imageUrl: 'any_image_url',
+    description: 'any_description'
+  }
 
-  async getGift(giftId: string): Promise<void> {
+  async getGift(giftId: string): Promise<Gift | undefined> {
     this.input = giftId
+    return this.output;
   }
 }
 
 class GetGiftByIdService implements GetGiftById {
   constructor(private readonly getGiftBydIdRepository: GetGiftByIdRepository) { }
 
-  async execute(giftId?: string): Promise<void> {
+  async execute(giftId?: string): Promise<Gift | undefined> {
     if (!giftId) throw new MissingParameterError('giftId')
-    await this.getGiftBydIdRepository.getGift(giftId)
+
+    const foundGift = await this.getGiftBydIdRepository.getGift(giftId)
+
+    if (!foundGift) throw new GiftNotFoundError()
+
+    return foundGift
   }
 }
 
@@ -59,5 +80,14 @@ describe('get-gift-by-id', () => {
     const promise = sut.execute(undefined)
 
     await expect(promise).rejects.toThrowError(new MissingParameterError('giftId'))
+  })
+
+  it('should throw an error if no gift is found', async () => {
+    const { sut, getGiftByIdRepository } = makeSut()
+    getGiftByIdRepository.output = undefined
+
+    const promise = sut.execute(fakeGiftId)
+
+    await expect(promise).rejects.toThrowError(new GiftNotFoundError())
   })
 })
