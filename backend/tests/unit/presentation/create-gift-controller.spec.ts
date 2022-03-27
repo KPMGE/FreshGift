@@ -2,13 +2,9 @@ import { CreateGiftService } from "../../../src/data/services/gift"
 import { MissingParameterError } from "../../../src/domain/errors"
 import { CreateGift } from "../../../src/domain/useCases/gift"
 import { HttpRequest, HttpResponse } from "../../../src/presentation/contracts"
+import { Controller } from "../../../src/presentation/contracts/controller"
 import { GiftViewModel } from "../../../src/presentation/view-models"
 import { SaveGiftRepositoryMock } from "../domain/repositories/gift"
-
-
-interface Controller {
-  handle(req?: HttpRequest): Promise<HttpResponse>
-}
 
 const serverError = (error: Error): HttpResponse => {
   return {
