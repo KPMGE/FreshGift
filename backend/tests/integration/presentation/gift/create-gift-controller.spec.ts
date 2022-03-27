@@ -1,18 +1,19 @@
-import { CreateGiftService } from "../../../src/data/services/gift"
-import { MissingParameterError } from "../../../src/domain/errors"
-import { HttpRequest, serverError } from "../../../src/presentation/contracts"
-import { CreateGiftController } from "../../../src/presentation/controllers"
-import { GiftViewModel } from "../../../src/presentation/view-models"
-import { SaveGiftRepositoryMock } from "../domain/repositories/gift"
+import { SaveGiftRepository } from "../../../../src/data/contracts/gift"
+import { CreateGiftService } from "../../../../src/data/services/gift"
+import { MissingParameterError } from "../../../../src/domain/errors"
+import { FakeSaveGiftRepository } from "../../../../src/infra/repositories"
+import { HttpRequest, serverError } from "../../../../src/presentation/contracts"
+import { CreateGiftController } from "../../../../src/presentation/controllers"
+import { GiftViewModel } from "../../../../src/presentation/view-models"
 
 type SutTypes = {
   sut: CreateGiftController,
   createGiftService: CreateGiftService
-  saveGiftRepository: SaveGiftRepositoryMock
+  saveGiftRepository: SaveGiftRepository
 }
 
 const makeSut = (): SutTypes => {
-  const saveGiftRepository = new SaveGiftRepositoryMock()
+  const saveGiftRepository = new FakeSaveGiftRepository()
   const createGiftService = new CreateGiftService(saveGiftRepository)
   const sut = new CreateGiftController(createGiftService)
 
