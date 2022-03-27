@@ -1,7 +1,8 @@
 import { GiftDTO } from "../../../../src/data/DTO"
 import { ListGiftService } from "../../../../src/data/services/gift"
+import { Gift } from "../../../../src/domain/entities"
 import { ListGift } from "../../../../src/domain/useCases/gift"
-import { FakeListGiftRepository } from "../../../../src/infra/repositories"
+import { FakeListGiftRepository, FakeSaveGiftRepository } from "../../../../src/infra/repositories"
 import { HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 import { GiftViewModel } from "../../../../src/presentation/view-models"
@@ -36,6 +37,14 @@ const makeSut = (): SutTypes => {
 }
 
 describe('list-gifts', () => {
+  const fakeGift: Gift = {
+    id: 'any_gift_id',
+    name: 'any_gift_name',
+    price: 100,
+    imageUrl: 'any_image_url',
+    description: 'any_description'
+  }
+
   it('should return an empty array if no there is no saved gift', async () => {
     const { sut } = makeSut()
 
@@ -43,5 +52,22 @@ describe('list-gifts', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.data).toEqual([])
+  })
+
+  it('should list gifts', async () => {
+    const saveGiftRespository = new FakeSaveGiftRepository()
+
+    // save 3 gifts
+    await saveGiftRespository.save(fakeGift)
+    await saveGiftRespository.save(fakeGift)
+    await saveGiftRespository.save(fakeGift)
+
+    const { sut } = makeSut()
+
+    const response = await sut.handle()
+
+    expect(response.data.length).toBe(3)
+    expect(response.data[0]).toEqual(fakeGift)
+    expect(response.statusCode).toBe(200)
   })
 })
