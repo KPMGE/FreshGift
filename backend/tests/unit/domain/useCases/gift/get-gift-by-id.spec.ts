@@ -1,13 +1,6 @@
 import { Gift } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
 
-class GiftNotFoundError extends Error {
-  constructor() {
-    super('Gift not found!')
-    this.name = 'GiftNotFoundError '
-  }
-}
-
 interface GetGiftById {
   execute(giftId?: string): Promise<Gift | null>
 }
