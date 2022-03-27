@@ -21,6 +21,20 @@ class GetGiftByIdController implements Controller {
   }
 }
 
+type SutTypes = {
+  sut: GetGiftByIdController
+}
+
+const makeSut = (): SutTypes => {
+  const repo = new FakeGetGiftByIdRepository()
+  const service = new GetGiftByIdService(repo)
+  const sut = new GetGiftByIdController(service)
+
+  return {
+    sut
+  }
+}
+
 describe('get-gift-by-id', () => {
   const fakeGift: GiftDTO = {
     id: 'any_gift_id',
@@ -37,10 +51,7 @@ describe('get-gift-by-id', () => {
   })
 
   it('should return resourceNotFoundError no gift is found', async () => {
-    const repo = new FakeGetGiftByIdRepository()
-    const service = new GetGiftByIdService(repo)
-    const sut = new GetGiftByIdController(service)
-
+    const { sut } = makeSut()
 
     const gift = await sut.handle({ body: { giftId: 'invalid_gift_id' } })
 
@@ -49,9 +60,7 @@ describe('get-gift-by-id', () => {
   })
 
   it('should return serverError if service throws', async () => {
-    const repo = new FakeGetGiftByIdRepository()
-    const service = new GetGiftByIdService(repo)
-    const sut = new GetGiftByIdController(service)
+    const { sut } = makeSut()
 
 
     const response = await sut.handle()
