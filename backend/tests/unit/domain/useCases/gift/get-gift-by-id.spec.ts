@@ -1,23 +1,6 @@
-import { GetGiftByIdRepository } from "../../../../../src/data/contracts/gift/get-gift-by-id-repository"
 import { GetGiftByIdService } from "../../../../../src/data/services/gift"
-import { Gift } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
-
-class GetGiftByIdRepositoryMock implements GetGiftByIdRepository {
-  input?: string
-  output?: Gift = {
-    id: 'any_gift_id',
-    name: 'any_gift_name',
-    price: 100,
-    imageUrl: 'any_image_url',
-    description: 'any_description'
-  }
-
-  async getGift(giftId: string): Promise<Gift | undefined> {
-    this.input = giftId
-    return this.output;
-  }
-}
+import { GetGiftByIdRepositoryMock } from "../../repositories/gift/get-gift-by-id"
 
 type SutTypes = {
   sut: GetGiftByIdService,
@@ -34,7 +17,6 @@ const makeSut = (): SutTypes => {
   }
 }
 
-
 describe('get-gift-by-id', () => {
   const fakeGiftId = 'any_gift_id'
 
@@ -45,7 +27,6 @@ describe('get-gift-by-id', () => {
 
     expect(getGiftByIdRepository.input).toBe(fakeGiftId)
   })
-
 
   it('should throw an error if no valid id is provided', async () => {
     const { sut } = makeSut()
