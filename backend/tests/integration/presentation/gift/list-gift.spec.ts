@@ -1,9 +1,8 @@
-import { GiftDTO } from "../../../../src/data/DTO"
 import { ListGiftService } from "../../../../src/data/services/gift"
 import { Gift } from "../../../../src/domain/entities"
 import { ListGift } from "../../../../src/domain/useCases/gift"
 import { FakeListGiftRepository, FakeSaveGiftRepository } from "../../../../src/infra/repositories"
-import { HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
+import { HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 import { GiftViewModel } from "../../../../src/presentation/view-models"
 
@@ -21,7 +20,6 @@ class ListGiftController implements Controller {
 }
 
 type SutTypes = {
-
   sut: ListGiftController
 }
 
