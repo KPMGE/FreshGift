@@ -1,6 +1,7 @@
 import { DeleteGift } from "../../../../../src/domain/useCases/gift";
 import { DeleteGiftService } from "../../../../../src/data/services/gift";
 import { DeleteGiftRepositorySpy } from "../../repositories/gift";
+import { MissingParameterError } from "../../../../../src/domain/errors";
 
 type SutTypes = {
   sut: DeleteGift;
@@ -25,6 +26,15 @@ describe("delete-gift", () => {
     price: 0,
     imageUrl: "any_gift_image",
   };
+
+  it("should throw an error if no id is provided", async () => {
+    const { sut } = makeSut();
+
+    const promise = sut.execute(undefined);
+
+    await expect(promise).rejects.toThrowError(new MissingParameterError('id'));
+  });
+
 
   it("should call delete repository with correct data.", async () => {
     const { sut, deleteRepository } = makeSut();
