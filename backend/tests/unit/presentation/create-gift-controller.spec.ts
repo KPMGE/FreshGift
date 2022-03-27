@@ -1,10 +1,9 @@
-import { GiftDTO } from "../../../src/data/DTO"
 import { CreateGiftService } from "../../../src/data/services/gift"
 import { MissingParameterError } from "../../../src/domain/errors"
 import { CreateGift } from "../../../src/domain/useCases/gift"
+import { GiftViewModel } from "../../../src/presentation/view-models"
 import { SaveGiftRepositoryMock } from "../domain/repositories/gift"
 
-type GiftViewModel = GiftDTO
 
 interface HttpResponse<T = any> {
   statusCode: number
