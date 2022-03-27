@@ -1,5 +1,7 @@
 import { ListGiftRepository, SaveGiftRepository } from '../../../data/contracts/gift'
+import { GetGiftByIdRepository } from '../../../data/contracts/gift/get-gift-by-id-repository'
 import { DeleteUserRepository } from '../../../data/contracts/user'
+import { GiftDTO } from '../../../data/DTO'
 import { Gift } from '../../../domain/entities'
 import { GiftViewModel } from '../../../presentation/view-models'
 
@@ -32,3 +34,8 @@ export class FakeListGiftRepository implements ListGiftRepository {
   }
 }
 
+export class FakeGetGiftByIdRepository implements GetGiftByIdRepository {
+  async getGift(giftId: string): Promise<GiftDTO | undefined> {
+    return listGifts.find(gift => gift.id === giftId)
+  }
+}
