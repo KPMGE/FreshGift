@@ -1,5 +1,6 @@
 import { CreateGiftService } from "../../../src/data/services/gift"
 import { Gift } from "../../../src/domain/entities"
+import { MissingParameterError } from "../../../src/domain/errors"
 import { CreateGift } from "../../../src/domain/useCases/gift"
 import { SaveGiftRepositoryMock } from "../domain/repositories/gift"
 
@@ -20,8 +21,8 @@ class CreateGiftController implements Controller {
   constructor(private readonly createGiftService: CreateGift) { }
 
   async handle(req?: HttpRequest<any>): Promise<HttpResponse<Gift>> {
-    if (!req) throw new Error('no request!')
-    if (!req.body) new Error('missing body')
+    if (!req) throw new MissingParameterError('request')
+    if (!req.body) throw new MissingParameterError('request.body')
 
     return this.createGiftService.execute(req?.body)
   }
@@ -63,14 +64,15 @@ describe('create-gift-controller', () => {
 
     const promise = sut.handle()
 
-    await expect(promise).rejects.toThrowError()
+    await expect(promise).rejects.toThrowError(new MissingParameterError('request'))
   })
 
   it('should throw an error if no request body is provided', async () => {
     const { sut } = makeSut()
 
-    const promise = sut.handle()
+    fakeRequest.body = undefined
+    const promise = sut.handle(fakeRequest)
 
-    await expect(promise).rejects.toThrowError()
+    await expect(promise).rejects.toThrowError(new MissingParameterError('request.body'))
   })
 })
