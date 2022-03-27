@@ -20,13 +20,28 @@ class DeleteGiftController implements Controller {
 }
 
 describe('delete-gift', () => {
+  const fakeRequest: HttpRequest<{ giftId: string }> = {
+    body: { giftId: 'any_gift_id' }
+  }
+
   it('should return serverError if service throws', async () => {
     const deleteGiftRepository = new DeleteGiftRepositorySpy()
     const deleteGiftService = new DeleteGiftService(deleteGiftRepository)
     const sut = new DeleteGiftController(deleteGiftService)
 
-    const resonse = await sut.handle({})
+    const response = await sut.handle({})
 
-    expect(resonse).toEqual(serverError(new MissingParameterError('id')))
+    expect(response).toEqual(serverError(new MissingParameterError('id')))
+    expect(response.statusCode).toBe(500)
+  })
+
+  it('should return a valid HttpResponse with a valid deletedGift', async () => {
+    const deleteGiftRepository = new DeleteGiftRepositorySpy()
+    const deleteGiftService = new DeleteGiftService(deleteGiftRepository)
+    const sut = new DeleteGiftController(deleteGiftService)
+
+    const response = await sut.handle(fakeRequest)
+
+    expect(response.statusCode).toBe(200)
   })
 })
