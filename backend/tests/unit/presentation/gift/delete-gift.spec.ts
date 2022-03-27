@@ -1,15 +1,18 @@
 import { DeleteGiftService } from "../../../../src/data/services/gift"
+import { MissingParameterError } from "../../../../src/domain/errors"
 import { DeleteGift } from "../../../../src/domain/useCases/gift"
-import { HttpRequest, HttpResponse, serverError } from "../../../../src/presentation/contracts"
+import { HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
+import { GiftViewModel } from "../../../../src/presentation/view-models"
 import { DeleteGiftRepositorySpy } from "../../domain/repositories/gift"
 
 class DeleteGiftController implements Controller {
   constructor(private readonly deleteGiftService: DeleteGift) { }
 
-  async handle(req?: HttpRequest<{ giftId: string }>): Promise<HttpResponse<any>> {
+  async handle(req?: HttpRequest<{ giftId: string }>): Promise<HttpResponse<GiftViewModel>> {
     try {
-      await this.deleteGiftService.execute(req?.body?.giftId)
+      const deletedGift = await this.deleteGiftService.execute(req?.body?.giftId)
+      return ok(deletedGift)
     } catch (error) {
       return serverError(error as Error)
     }
@@ -24,6 +27,6 @@ describe('delete-gift', () => {
 
     const resonse = await sut.handle({})
 
-    expect(resonse).toEqual(serverError(new Error()))
+    expect(resonse).toEqual(serverError(new MissingParameterError('id')))
   })
 })
