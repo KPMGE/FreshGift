@@ -22,15 +22,31 @@ class GetGiftByIdService implements GetGiftById {
   }
 }
 
+type SutTypes = {
+  sut: GetGiftByIdService,
+  getGiftByIdRepository: GetGiftByIdRepositoryMock
+}
+
+const makeSut = (): SutTypes => {
+  const getGiftByIdRepository = new GetGiftByIdRepositoryMock()
+  const sut = new GetGiftByIdService(getGiftByIdRepository)
+
+  return {
+    sut,
+    getGiftByIdRepository
+  }
+}
+
+
 describe('get-gift-by-id', () => {
   const fakeGiftId = 'any_gift_id'
 
   it('should call repository with right data', async () => {
-    const getGiftByIdRepository = new GetGiftByIdRepositoryMock()
-    const sut = new GetGiftByIdService(getGiftByIdRepository)
+    const { sut, getGiftByIdRepository } = makeSut()
 
     await sut.execute(fakeGiftId)
 
     expect(getGiftByIdRepository.input).toBe(fakeGiftId)
+
   })
 })
