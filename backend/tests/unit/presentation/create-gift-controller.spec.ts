@@ -78,9 +78,10 @@ describe('create-gift-controller', () => {
   it('should return serverError if createGiftService throws', async () => {
     const { sut } = makeSut()
 
-    const output = await sut.handle({})
+    const response = await sut.handle({})
 
-    expect(output).toEqual(serverError(new MissingParameterError('gift')))
+    expect(response).toEqual(serverError(new MissingParameterError('gift')))
+    expect(response.statusCode).toBe(500)
   })
 
   it('should return ok with the saved gift', async () => {
@@ -90,5 +91,6 @@ describe('create-gift-controller', () => {
 
     expect(response).toBeTruthy()
     expect(response.data).toEqual(fakeGift)
+    expect(response.statusCode).toBe(200)
   })
 })
