@@ -1,27 +1,9 @@
 import { RegisterUserService } from "../../../../src/data/services/user"
-import { InvalidEmailError, MissingParameterError, PasswordsDontMatchError } from "../../../../src/domain/errors"
-import { RegisterUser } from "../../../../src/domain/useCases/user"
 import { FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
-import { badRequest, HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
+import { HttpRequest } from "../../../../src/presentation/contracts"
+import { RegisterUserController } from "../../../../src/presentation/controllers/user/register-user"
 import { RandomIdGeneratorProviderStub } from "../../../unit/domain/providers"
 import { TokenGeneratorProviderSpy } from "../../../unit/domain/providers/token-generator"
-
-class RegisterUserController implements Controller {
-  constructor(private readonly registerUserService: RegisterUser) { }
-
-  async handle(req?: HttpRequest<RegisterUserService.Props>): Promise<HttpResponse<string>> {
-    try {
-      const registeredUser = await this.registerUserService.execute(req?.body)
-      return ok(registeredUser)
-    } catch (error) {
-      if (error instanceof MissingParameterError) return badRequest(error.message)
-      if (error instanceof PasswordsDontMatchError) return badRequest(error.message)
-      if (error instanceof InvalidEmailError) return badRequest(error.message)
-      return serverError(error as Error)
-    }
-  }
-}
 
 type SutTypes = {
   sut: RegisterUserController
