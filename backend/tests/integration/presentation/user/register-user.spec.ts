@@ -1,7 +1,7 @@
 import { RegisterUserService } from "../../../../src/data/services/user"
 import { RegisterUser } from "../../../../src/domain/useCases/user"
 import { FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
-import { HttpRequest, HttpResponse, ok } from "../../../../src/presentation/contracts"
+import { HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 import { RandomIdGeneratorProviderStub } from "../../../unit/domain/providers"
 import { TokenGeneratorProviderSpy } from "../../../unit/domain/providers/token-generator"
@@ -10,8 +10,12 @@ class RegisterUserController implements Controller {
   constructor(private readonly registerUserService: RegisterUser) { }
 
   async handle(req?: HttpRequest<RegisterUserService.Props>): Promise<HttpResponse<string>> {
-    const registeredUser = await this.registerUserService.execute(req?.body)
-    return ok(registeredUser)
+    try {
+      const registeredUser = await this.registerUserService.execute(req?.body)
+      return ok(registeredUser)
+    } catch (error) {
+      return serverError(error as Error)
+    }
   }
 }
 
@@ -49,6 +53,15 @@ describe('register-user-controller', () => {
     const response = await sut.handle(fakeRequest)
 
     expect(response.statusCode).toBe(200)
+    expect(response.data).toBeTruthy()
+  })
+
+  it('should return a serverError if no request is provided', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle()
+
+    expect(response.statusCode).toBe(500)
     expect(response.data).toBeTruthy()
   })
 })
