@@ -1,7 +1,8 @@
 import { RegisterUserService } from "../../../../src/data/services/user"
+import { MissingParameterError } from "../../../../src/domain/errors"
 import { RegisterUser } from "../../../../src/domain/useCases/user"
 import { FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
-import { HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
+import { badRequest, HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 import { RandomIdGeneratorProviderStub } from "../../../unit/domain/providers"
 import { TokenGeneratorProviderSpy } from "../../../unit/domain/providers/token-generator"
@@ -14,6 +15,7 @@ class RegisterUserController implements Controller {
       const registeredUser = await this.registerUserService.execute(req?.body)
       return ok(registeredUser)
     } catch (error) {
+      if (error instanceof MissingParameterError) return badRequest(error.message)
       return serverError(error as Error)
     }
   }
@@ -56,12 +58,17 @@ describe('register-user-controller', () => {
     expect(response.data).toBeTruthy()
   })
 
-  it('should return a serverError if no request is provided', async () => {
+  it('should return a badRequest if no name is provided', async () => {
     const { sut } = makeSut()
 
-    const response = await sut.handle()
+    const response = await sut.handle({
+      ...fakeRequest, body: {
+        ...fakeNewUser,
+        name: ''
+      }
+    })
 
-    expect(response.statusCode).toBe(500)
-    expect(response.data).toBeTruthy()
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Missing parameter: name')
   })
 })

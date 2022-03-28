@@ -21,6 +21,13 @@ export const ok = (data: any): HttpResponse => {
   }
 }
 
+export const badRequest = (resource: string): HttpResponse => {
+  return {
+    statusCode: 404,
+    data: resource
+  }
+}
+
 export const resourceNotFoundError = (resource: string): HttpResponse => {
   return {
     statusCode: 404,
