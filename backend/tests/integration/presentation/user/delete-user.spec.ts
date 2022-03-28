@@ -1,24 +1,8 @@
 import { UserDTO } from "../../../../src/data/DTO"
 import { DeleteUserService } from "../../../../src/data/services/user"
-import { CannotDeleteUserError } from "../../../../src/domain/errors"
-import { DeleteUser } from "../../../../src/domain/useCases/user"
 import { FakeDeleteUserRepository, FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
 import { badRequest, HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
-
-class DeleteUserController implements Controller {
-  constructor(private readonly deleteUserService: DeleteUser) { }
-
-  async handle(req?: HttpRequest<{ userId: string }>): Promise<HttpResponse<UserDTO>> {
-    try {
-      const deletedUser = await this.deleteUserService.execute(req?.body?.userId)
-      return ok(deletedUser)
-    } catch (error) {
-      if (error instanceof CannotDeleteUserError) return badRequest(error.message)
-      return serverError(error as Error)
-    }
-  }
-}
+import { DeleteUserController } from "../../../../src/presentation/controllers/user"
 
 type SutTypes = {
   sut: DeleteUserController
