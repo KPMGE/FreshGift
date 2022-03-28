@@ -1,6 +1,6 @@
 import { RandomIdGeneratorProvider } from "../../../../../src/data/providers"
 import { RegisterUserService } from "../../../../../src/data/services/user/register-user"
-import { MissingParameterError, PasswordsDontMatchError } from "../../../../../src/domain/errors"
+import { InvalidEmailError, MissingParameterError, PasswordsDontMatchError } from "../../../../../src/domain/errors"
 import { RandomIdGeneratorProviderStub } from "../../providers"
 import { TokenGeneratorProviderSpy } from "../../providers/token-generator"
 import { RegisterUserRepositorySpy } from "../../repositories/user"
@@ -142,7 +142,7 @@ describe("register-user", () => {
 
     const promise = sut.execute({ ...fakeUser, email: "invalid_email" })
 
-    await expect(promise).rejects.toThrowError()
+    await expect(promise).rejects.toThrowError(new InvalidEmailError())
   })
 
   it("should throw and error password and confirmPassword don't match", async () => {
