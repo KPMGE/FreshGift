@@ -71,4 +71,47 @@ describe('register-user-controller', () => {
     expect(response.statusCode).toBe(404)
     expect(response.data).toBe('Missing parameter: name')
   })
+
+  it('should return a badRequest if no userName is provided', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle({
+      ...fakeRequest, body: {
+        ...fakeNewUser,
+        userName: ''
+      }
+    })
+
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Missing parameter: userName')
+  })
+
+  it('should return a badRequest if no password is provided', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle({
+      ...fakeRequest, body: {
+        ...fakeNewUser,
+        password: ''
+      }
+    })
+
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Missing parameter: password')
+  })
+
+
+  it('should return a badRequest if no confirmPassword is provided', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle({
+      ...fakeRequest, body: {
+        ...fakeNewUser,
+        confirmPassword: ''
+      }
+    })
+
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Missing parameter: confirmPassword')
+  })
 })
