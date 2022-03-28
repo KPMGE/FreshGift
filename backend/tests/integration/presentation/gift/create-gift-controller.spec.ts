@@ -4,7 +4,7 @@ import { MissingParameterError } from "../../../../src/domain/errors"
 import { CreateGift } from "../../../../src/domain/useCases/gift"
 import { FakeSaveGiftRepository } from "../../../../src/infra/repositories"
 import { HttpRequest, serverError } from "../../../../src/presentation/contracts"
-import { CreateGiftController } from "../../../../src/presentation/controllers"
+import { CreateGiftController } from "../../../../src/presentation/controllers/gift"
 import { RandomIdGeneratorProviderStub } from "../../../unit/domain/providers"
 
 type SutTypes = {

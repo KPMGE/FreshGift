@@ -1,25 +1,8 @@
 import { GiftDTO } from "../../../../src/data/DTO"
 import { GetGiftByIdService } from "../../../../src/data/services/gift"
 import { MissingParameterError } from "../../../../src/domain/errors"
-import { GetGiftById } from "../../../../src/domain/useCases/gift"
 import { FakeGetGiftByIdRepository, FakeSaveGiftRepository } from "../../../../src/infra/repositories"
-import { HttpRequest, HttpResponse, ok, resourceNotFoundError, serverError } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
-import { GiftViewModel } from "../../../../src/presentation/view-models"
-
-class GetGiftByIdController implements Controller {
-  constructor(private readonly getGiftByIdService: GetGiftById) { }
-
-  async handle(req?: HttpRequest<{ giftId: string }>): Promise<HttpResponse<GiftViewModel>> {
-    try {
-      const foundGift = await this.getGiftByIdService.execute(req?.body?.giftId)
-      if (!foundGift) return resourceNotFoundError('gift')
-      return ok(foundGift)
-    } catch (error) {
-      return serverError(error as Error)
-    }
-  }
-}
+import { GetGiftByIdController } from "../../../../src/presentation/controllers/gift"
 
 type SutTypes = {
   sut: GetGiftByIdController
