@@ -1,19 +1,7 @@
-import { GiftDTO } from "../../../../src/data/DTO"
 import { UpdateGiftService } from "../../../../src/data/services/gift"
 import { UpdateGift } from "../../../../src/domain/useCases/gift"
 import { FakeGetGiftByIdRepository, FakeSaveGiftRepository, FakeUpdateGiftRepository } from "../../../../src/infra/repositories"
-import { HttpRequest, HttpResponse, ok, resourceNotFoundError } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
-
-class UpdateGiftController implements Controller {
-  constructor(private readonly updateGiftService: UpdateGift) { }
-
-  async handle(req?: HttpRequest<{ giftId: string, newGift: UpdateGift.Props }>): Promise<HttpResponse<GiftDTO | null>> {
-    const foundGift = await this.updateGiftService.execute(req?.body?.giftId)
-    if (!foundGift) return resourceNotFoundError('gift')
-    return ok(foundGift)
-  }
-}
+import { UpdateGiftController } from "../../../../src/presentation/controllers/gift"
 
 type SutTypes = {
   sut: UpdateGiftController
