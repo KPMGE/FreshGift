@@ -1,7 +1,9 @@
 import { Gift } from "../../entities";
 
-export type UpdateGiftProps = Omit<Gift, 'id'>
-
 export interface UpdateGift {
-  execute(giftId?: string, newGift?: UpdateGiftProps): Promise<Gift | null>;
+  execute(giftId?: string, newGift?: UpdateGift.Props): Promise<Gift | null>
+}
+
+export namespace UpdateGift {
+  export type Props = Omit<Gift, 'id'>
 }

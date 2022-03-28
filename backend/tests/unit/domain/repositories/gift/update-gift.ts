@@ -1,10 +1,10 @@
 import { UpdateGiftRepository } from "../../../../../src/data/contracts/gift";
 import { GiftDTO } from "../../../../../src/data/DTO";
-import { UpdateGiftProps } from "../../../../../src/domain/useCases/gift";
+import { UpdateGift } from "../../../../../src/domain/useCases/gift";
 
 export class UpdateGiftRepositorySpy implements UpdateGiftRepository {
   giftId?: string;
-  newGift?: UpdateGiftProps
+  newGift?: UpdateGift.Props
   callsCount: number = 0;
   output?: GiftDTO = {
     id: "any_gift_id",
@@ -14,7 +14,7 @@ export class UpdateGiftRepositorySpy implements UpdateGiftRepository {
     imageUrl: "any_image",
   };
 
-  async update(giftId?: string, newGift?: UpdateGiftProps): Promise<GiftDTO | undefined> {
+  async update(giftId?: string, newGift?: UpdateGift.Props): Promise<GiftDTO | undefined> {
     this.giftId = giftId
     this.newGift = newGift
     this.callsCount++
