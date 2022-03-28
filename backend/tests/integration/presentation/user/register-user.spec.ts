@@ -17,6 +17,7 @@ class RegisterUserController implements Controller {
     } catch (error) {
       if (error instanceof MissingParameterError) return badRequest(error.message)
       if (error instanceof PasswordsDontMatchError) return badRequest(error.message)
+      if (error instanceof InvalidEmailError) return badRequest(error.message)
       return serverError(error as Error)
     }
   }
@@ -59,7 +60,7 @@ describe('register-user-controller', () => {
     expect(response.data).toBeTruthy()
   })
 
-  it('should return a badRequest password and confirmPassword don\'t match', async () => {
+  it('should return a badRequest if password and confirmPassword don\'t match', async () => {
     const { sut } = makeSut()
 
     const response = await sut.handle({
@@ -72,6 +73,20 @@ describe('register-user-controller', () => {
 
     expect(response.statusCode).toBe(404)
     expect(response.data).toBe('password and confirmPassword don\'t match')
+  })
+
+  it('should return a badRequest if email is invalid', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle({
+      ...fakeRequest, body: {
+        ...fakeNewUser,
+        email: 'invalid_email_address'
+      }
+    })
+
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Invalid email')
   })
 
   it('should return a badRequest if no name is provided', async () => {
