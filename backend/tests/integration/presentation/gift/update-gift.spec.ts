@@ -1,6 +1,6 @@
 import { GiftDTO } from "../../../../src/data/DTO"
 import { UpdateGiftService } from "../../../../src/data/services/gift"
-import { UpdateGift } from "../../../../src/domain/useCases/gift"
+import { UpdateGift, UpdateGiftProps } from "../../../../src/domain/useCases/gift"
 import { FakeGetGiftByIdRepository, FakeSaveGiftRepository, FakeUpdateGiftRepository } from "../../../../src/infra/repositories"
 import { HttpRequest, HttpResponse, ok, resourceNotFoundError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
@@ -8,7 +8,7 @@ import { Controller } from "../../../../src/presentation/contracts/controller"
 class UpdateGiftController implements Controller {
   constructor(private readonly updateGiftService: UpdateGift) { }
 
-  async handle(req?: HttpRequest<{ giftId: string }>): Promise<HttpResponse<GiftDTO | null>> {
+  async handle(req?: HttpRequest<{ giftId: string, newGift: UpdateGiftProps }>): Promise<HttpResponse<GiftDTO | null>> {
     const foundGift = await this.updateGiftService.execute(req?.body?.giftId)
     if (!foundGift) return resourceNotFoundError('gift')
     return ok(foundGift)
@@ -30,8 +30,7 @@ const makeSut = (): SutTypes => {
 }
 
 describe('update-gift', () => {
-  const fakeGift: GiftDTO = {
-    id: 'any_gift_id',
+  const fakeNewGift: UpdateGiftProps = {
     name: 'any_name',
     price: 100,
     imageUrl: 'any_image_url',
@@ -41,7 +40,7 @@ describe('update-gift', () => {
   beforeAll(async () => {
     // save a fake gift in the respository
     const saveGiftRepository = new FakeSaveGiftRepository()
-    await saveGiftRepository.save(fakeGift)
+    await saveGiftRepository.save({ ...fakeNewGift, id: 'any_gift_id' })
   })
 
   it('should return resourceNotFoundError if gift is not found', async () => {
@@ -58,16 +57,17 @@ describe('update-gift', () => {
 
     const response = await sut.handle({
       body: {
-
+        giftId: 'any_gift_id',
+        newGift: fakeNewGift
       }
     })
 
     expect(response.statusCode).toBe(200)
-    expect(response.data).toBe(fakeGift)
+    expect(response.data).toEqual({ ...fakeNewGift, id: 'any_gift_id' })
 
     const getGiftByIdRepository = new FakeGetGiftByIdRepository()
-    const updatedGift = await getGiftByIdRepository.getGift(fakeGift.id)
+    const updatedGift = await getGiftByIdRepository.getGift('any_gift_id')
 
-    expect(updatedGift).toEqual(fakeGift)
+    expect(updatedGift).toEqual({ ...fakeNewGift, id: 'any_gift_id' })
   })
 })
