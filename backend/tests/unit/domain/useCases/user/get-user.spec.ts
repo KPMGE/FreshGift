@@ -1,6 +1,7 @@
 import { GetUserService } from "../../../../../src/data/services/user/get-user"
 import { User } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
+import { GetUser } from "../../../../../src/domain/useCases/user"
 import { GetUserRepositorySpy } from "../../repositories/user/get-user"
 
 type SutTypes = {
@@ -19,30 +20,25 @@ const makeSut = (): SutTypes => {
 }
 
 describe('get-user', () => {
-  const fakeUser: User = {
-    id: 'any_user_id',
-    name: 'any_name',
-    email: 'any_valid@gmail.com',
-    password: 'any_password',
-    confirmPassword: 'any_password',
-    userName: 'any_username',
-    savedGifts: []
-  }
+  const fakeUserId = 'any_user_id'
 
   it('should call repository with right id', async () => {
     const { sut, getUserRepositorySpy } = makeSut()
 
-    await sut.execute(fakeUser.id)
+    await sut.execute(fakeUserId)
 
-    expect(getUserRepositorySpy.userId).toBe(fakeUser.id)
+    expect(getUserRepositorySpy.userId).toBe(fakeUserId)
   })
 
   it('should return a valid user', async () => {
-    const { sut, getUserRepositorySpy } = makeSut()
+    const { sut } = makeSut()
 
-    const user = await sut.execute(fakeUser.id)
+    const user = await sut.execute(fakeUserId)
 
-    expect(getUserRepositorySpy.output).toBe(user)
+    expect(user).toHaveProperty('name')
+    expect(user).toHaveProperty('userName')
+    expect(user).toHaveProperty('email')
+    expect(user).toHaveProperty('savedGifts')
   })
 
   it('should throw an error if no userId is provided', async () => {

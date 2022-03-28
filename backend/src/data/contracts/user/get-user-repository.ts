@@ -1,3 +1,5 @@
+import { UserDTO } from "../../DTO";
+
 export interface GetUserRepository {
-  get(userId: string): Promise<User>
+  get(userId: string): Promise<UserDTO>
 }
