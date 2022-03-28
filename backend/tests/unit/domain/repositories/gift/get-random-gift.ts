@@ -1,16 +1,15 @@
-import { GiftDTO } from "../../../../../src/data/DTO";
-import { GetRandomGiftProvider } from "../../../../../src/data/providers/";
+import { GetRandomGiftProvider, RandomGiftType } from "../../../../../src/data/providers/";
+import { GiftPrice } from "../../../../../src/domain/useCases/gift";
 
 export class GetRandomGiftProviderStub implements GetRandomGiftProvider {
-  output: GiftDTO = {
-    id: "any_gift_id",
-    name: "gift",
-    price: 1,
-    imageUrl: "imageUrl",
-    description: "description",
-  };
+  output?: RandomGiftType = {
+    name: 'any_name',
+    price: 100,
+    imageUrl: 'any_image_url',
+    description: 'any_description'
+  }
 
-  async get(): Promise<GiftDTO> {
+  async get(input: GiftPrice): Promise<RandomGiftType | undefined> {
     return this.output;
   }
 }

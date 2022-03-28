@@ -1,4 +1,4 @@
-import { Gift } from "../../entities";
+import { RandomGiftType } from "../../../data/providers";
 
 export type GiftPrice = {
   min: number;
@@ -6,5 +6,5 @@ export type GiftPrice = {
 };
 
 export interface GetRandomGift {
-  execute(input: GiftPrice): Promise<Gift | undefined>;
+  execute(input: GiftPrice): Promise<RandomGiftType | undefined>;
 }

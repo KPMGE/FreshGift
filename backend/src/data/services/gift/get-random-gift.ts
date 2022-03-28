@@ -1,11 +1,10 @@
 import { GetRandomGift, GiftPrice } from "../../../domain/useCases/gift";
-import { GiftDTO } from "../../DTO";
-import { GetRandomGiftProvider } from "../../providers";
+import { GetRandomGiftProvider, RandomGiftType } from "../../providers";
 
 export class GetRandomGiftService implements GetRandomGift {
-  constructor(private readonly getRandomGiftProvider: GetRandomGiftProvider) {}
+  constructor(private readonly getRandomGiftProvider: GetRandomGiftProvider) { }
 
-  async execute(input: GiftPrice): Promise<GiftDTO | undefined> {
-    return this.getRandomGiftProvider.get();
+  async execute(input: GiftPrice): Promise<RandomGiftType | undefined> {
+    return this.getRandomGiftProvider.get(input);
   }
 }
