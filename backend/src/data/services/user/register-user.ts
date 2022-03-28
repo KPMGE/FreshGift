@@ -21,7 +21,8 @@ export class RegisterUserService implements RegisterUser {
     private readonly tokenGeneratorProvider: TokenGeneratorProvider
   ) { }
 
-  async execute(user: RegisterUserService.Props): Promise<string> {
+  async execute(user?: RegisterUserService.Props): Promise<string> {
+    if (!user) throw new MissingParameterError("user");
     if (!user.name) throw new MissingParameterError("name");
     if (!user.userName) throw new MissingParameterError("userName");
     if (!user.password) throw new MissingParameterError("password");

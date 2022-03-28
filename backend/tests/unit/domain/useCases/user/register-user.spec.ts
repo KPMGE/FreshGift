@@ -85,6 +85,16 @@ describe("register-user", () => {
     })
   })
 
+  it("should throw and error no user is provided", async () => {
+    const { sut } = makeSut()
+
+    const promise = sut.execute(undefined)
+
+    await expect(promise).rejects.toThrowError(
+      new MissingParameterError("user")
+    )
+  })
+
   it("should throw and error if the name field is not filled in", async () => {
     const { sut } = makeSut()
 
