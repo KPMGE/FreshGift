@@ -5,10 +5,10 @@ import { RandomIdGeneratorProviderStub } from "../../providers"
 import { RegisterUserRepositorySpy } from "../../repositories/user"
 
 class TokenGeneratorProviderSpy implements TokenGeneratorProvider {
-  output?: string
+  input?: string
 
   generate(userId: string): string {
-    this.output = userId
+    this.input = userId
     return 'any_token'
   }
 }
@@ -17,6 +17,7 @@ type SutTypes = {
   sut: RegisterUserService
   registerUserRepository: RegisterUserRepositorySpy
   genereateIdProvider: RandomIdGeneratorProvider
+  tokenGeneratorProvider: TokenGeneratorProviderSpy
 }
 
 const makeSut = (): SutTypes => {
@@ -33,6 +34,7 @@ const makeSut = (): SutTypes => {
     sut,
     registerUserRepository,
     genereateIdProvider,
+    tokenGeneratorProvider
   }
 }
 
@@ -53,6 +55,14 @@ describe("register-user", () => {
 
       expect(id).toBeTruthy()
     })
+  })
+
+  it("should call token generator with right userId", async () => {
+    const { sut, tokenGeneratorProvider } = makeSut()
+
+    await sut.execute(fakeUser)
+
+    expect(tokenGeneratorProvider.input).toBe('any_valid_id')
   })
 
   it("should return a string token", async () => {
