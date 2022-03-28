@@ -1,4 +1,4 @@
-import { Gift, User } from "../../entities";
+import { Gift } from "../../entities";
 
 export namespace GetUser {
   export type Result = {
@@ -10,5 +10,5 @@ export namespace GetUser {
 }
 
 export interface GetUser {
-  execute(userId: string): Promise<GetUser.Result>
+  execute(userId: string): Promise<GetUser.Result | null>
 }

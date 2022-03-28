@@ -1,7 +1,5 @@
 import { GetUserService } from "../../../../../src/data/services/user/get-user"
-import { User } from "../../../../../src/domain/entities"
 import { MissingParameterError } from "../../../../../src/domain/errors"
-import { GetUser } from "../../../../../src/domain/useCases/user"
 import { GetUserRepositorySpy } from "../../repositories/user/get-user"
 
 type SutTypes = {
@@ -28,6 +26,16 @@ describe('get-user', () => {
     await sut.execute(fakeUserId)
 
     expect(getUserRepositorySpy.userId).toBe(fakeUserId)
+  })
+
+  it('should return null if invalid id is provided', async () => {
+    const { sut, getUserRepositorySpy } = makeSut()
+
+    getUserRepositorySpy.output = undefined
+
+    const user = await sut.execute('invali_user_id')
+
+    expect(user).toBe(null)
   })
 
   it('should return a valid user', async () => {

@@ -1,5 +1,5 @@
 import { UserDTO } from "../../DTO";
 
 export interface GetUserRepository {
-  get(userId: string): Promise<UserDTO>
+  get(userId: string): Promise<UserDTO | undefined>
 }

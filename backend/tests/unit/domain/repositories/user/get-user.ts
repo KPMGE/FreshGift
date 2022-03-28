@@ -1,9 +1,9 @@
 import { GetUserRepository } from "../../../../../src/data/contracts/user"
-import { User } from "../../../../../src/domain/entities"
+import { UserDTO } from "../../../../../src/data/DTO"
 
 export class GetUserRepositorySpy implements GetUserRepository {
   userId: string = 'any_user_id'
-  output: User = {
+  output?: UserDTO = {
     id: 'any_user_id',
     name: 'any_name',
     email: 'any_valid@gmail.com',
@@ -13,7 +13,7 @@ export class GetUserRepositorySpy implements GetUserRepository {
     savedGifts: []
   }
 
-  async get(userId: string): Promise<User> {
+  async get(userId: string): Promise<UserDTO | undefined> {
     this.userId = userId
     return this.output
   }
