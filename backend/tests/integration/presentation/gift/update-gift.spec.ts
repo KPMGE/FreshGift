@@ -30,6 +30,7 @@ const makeSut = (): SutTypes => {
 }
 
 describe('update-gift', () => {
+  const fakeGiftId = 'any_gift_id'
   const fakeNewGift: UpdateGiftProps = {
     name: 'any_name',
     price: 100,
@@ -40,7 +41,7 @@ describe('update-gift', () => {
   beforeAll(async () => {
     // save a fake gift in the respository
     const saveGiftRepository = new FakeSaveGiftRepository()
-    await saveGiftRepository.save({ ...fakeNewGift, id: 'any_gift_id' })
+    await saveGiftRepository.save({ ...fakeNewGift, id: fakeGiftId })
   })
 
   it('should return resourceNotFoundError if gift is not found', async () => {
@@ -57,17 +58,17 @@ describe('update-gift', () => {
 
     const response = await sut.handle({
       body: {
-        giftId: 'any_gift_id',
+        giftId: fakeGiftId,
         newGift: fakeNewGift
       }
     })
 
     expect(response.statusCode).toBe(200)
-    expect(response.data).toEqual({ ...fakeNewGift, id: 'any_gift_id' })
+    expect(response.data).toEqual({ ...fakeNewGift, id: fakeGiftId })
 
     const getGiftByIdRepository = new FakeGetGiftByIdRepository()
-    const updatedGift = await getGiftByIdRepository.getGift('any_gift_id')
+    const updatedGift = await getGiftByIdRepository.getGift(fakeGiftId)
 
-    expect(updatedGift).toEqual({ ...fakeNewGift, id: 'any_gift_id' })
+    expect(updatedGift).toEqual({ ...fakeNewGift, id: fakeGiftId })
   })
 })
