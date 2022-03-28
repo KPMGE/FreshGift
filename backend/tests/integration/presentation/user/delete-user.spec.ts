@@ -1,17 +1,22 @@
 import { UserDTO } from "../../../../src/data/DTO"
 import { DeleteUserService } from "../../../../src/data/services/user"
+import { CannotDeleteUserError } from "../../../../src/domain/errors"
 import { DeleteUser } from "../../../../src/domain/useCases/user"
 import { FakeDeleteUserRepository, FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
-import { HttpRequest, HttpResponse, ok } from "../../../../src/presentation/contracts"
+import { badRequest, HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 
 class DeleteUserController implements Controller {
   constructor(private readonly deleteUserService: DeleteUser) { }
 
   async handle(req?: HttpRequest<{ userId: string }>): Promise<HttpResponse<UserDTO>> {
-    const deletedUser = await this.deleteUserService.execute(req?.body?.userId)
-
-    return ok(deletedUser)
+    try {
+      const deletedUser = await this.deleteUserService.execute(req?.body?.userId)
+      return ok(deletedUser)
+    } catch (error) {
+      if (error instanceof CannotDeleteUserError) return badRequest(error.message)
+      return serverError(error as Error)
+    }
   }
 }
 
@@ -57,5 +62,18 @@ describe('delete-user', () => {
 
     expect(deletedUser.statusCode).toBe(200)
     expect(deletedUser.data).toEqual(fakeUser)
+  })
+
+  it('should return badRequest if wrong userId is passed', async () => {
+    // save a user in the fake db
+    const registerUserRepository = new FakeRegisterUserRepository()
+    await registerUserRepository.register(fakeUser)
+
+    const { sut } = makeSut()
+
+    const deletedUser = await sut.handle({ body: { userId: 'wrong_user_id' } })
+
+    expect(deletedUser.statusCode).toBe(404)
+    expect(deletedUser.data).toBe('Cannot delete user')
   })
 })
