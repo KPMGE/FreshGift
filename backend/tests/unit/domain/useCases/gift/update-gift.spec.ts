@@ -1,6 +1,6 @@
-import { Gift } from "../../../../../src/domain/entities";
 import { UpdateGiftService } from "../../../../../src/data/services/gift";
 import { UpdateGiftRepositorySpy } from "../../repositories/gift/";
+import { UpdateGiftProps } from "../../../../../src/domain/useCases/gift";
 
 type SutTypes = {
   sut: UpdateGiftService;
@@ -18,40 +18,42 @@ const makeSut = (): SutTypes => {
 };
 
 describe("update-gift", () => {
-  const fakeGift: Gift = {
-    id: "any_gift_id",
+  const fakeGiftId = 'any_gift_id'
+  const fakeNewGift: UpdateGiftProps = {
     name: "any_name",
     description: "any_description",
     price: 1,
     imageUrl: "any_image",
   };
 
-  it("should call update repository with the right id", async () => {
+  it("should call update repository with the right data", async () => {
     const { sut, updateGiftRepository } = makeSut();
-    await sut.execute(fakeGift.id);
+    await sut.execute(fakeGiftId, fakeNewGift);
 
-    expect(updateGiftRepository.giftId).toBe(fakeGift.id);
+    expect(updateGiftRepository.giftId).toBe(fakeGiftId);
+    expect(updateGiftRepository.newGift).toEqual(fakeNewGift)
   });
 
   it("should return the updated gift", async () => {
     const { sut } = makeSut();
-    const updatedGift = await sut.execute(fakeGift.id);
 
-    expect(updatedGift).toEqual(fakeGift);
+    const updatedGift = await sut.execute(fakeGiftId);
+
+    expect(updatedGift).toEqual({ ...fakeNewGift, id: fakeGiftId });
   });
 
   it("should call repository only once", async () => {
     const { sut, updateGiftRepository } = makeSut();
-    await sut.execute(fakeGift.id);
+    await sut.execute(fakeGiftId);
 
-    expect(updateGiftRepository.callsCount).toEqual(1);
+    expect(updateGiftRepository.callsCount).toBe(1);
   });
 
   it("should return null if no gift is found", async () => {
     const { sut, updateGiftRepository } = makeSut();
     updateGiftRepository.output = undefined
 
-    const foundGift = await sut.execute(fakeGift.id);
+    const foundGift = await sut.execute(fakeGiftId);
 
     expect(foundGift).toBeNull();
   });
