@@ -1,19 +1,34 @@
-import { GetRandomGiftService } from "../../../../../src/data/services/gift";
-import { GetRandomGiftProviderStub } from "../../repositories/gift/get-random-gift";
+import { GetRandomGiftService } from "../../../../../src/data/services/gift"
+import { GetRandomGiftProviderStub } from "../../repositories/gift/get-random-gift"
+
+type SutTypes = {
+  sut: GetRandomGiftService,
+  getRandomGiftProvider: GetRandomGiftProviderStub
+}
+
+const makeSut = (): SutTypes => {
+  const getRandomGiftProvider = new GetRandomGiftProviderStub()
+  const sut = new GetRandomGiftService(getRandomGiftProvider)
+
+  return {
+    sut,
+    getRandomGiftProvider
+  }
+}
+
 
 describe("get-random-gift", () => {
   it("should return a random gift inside the given range", async () => {
-    const getRandomGiftProvider = new GetRandomGiftProviderStub();
-    const sut = new GetRandomGiftService(getRandomGiftProvider);
+    const { sut } = makeSut()
 
-    const gift = await sut.execute({ min: 0, max: 200 });
+    const gift = await sut.execute({ min: 0, max: 200 })
 
-    expect(gift?.price).toBeGreaterThanOrEqual(0);
-    expect(gift?.price).toBeLessThanOrEqual(200);
-    expect(gift).toBeTruthy();
-    expect(gift).toHaveProperty("description");
-    expect(gift).toHaveProperty("name");
-    expect(gift).toHaveProperty("price");
-    expect(gift).toHaveProperty("imageUrl");
-  });
-});
+    expect(gift?.price).toBeGreaterThanOrEqual(0)
+    expect(gift?.price).toBeLessThanOrEqual(200)
+    expect(gift).toBeTruthy()
+    expect(gift).toHaveProperty("description")
+    expect(gift).toHaveProperty("name")
+    expect(gift).toHaveProperty("price")
+    expect(gift).toHaveProperty("imageUrl")
+  })
+})

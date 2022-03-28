@@ -1,8 +1,5 @@
-import { GiftPrice } from "../../domain/useCases/gift";
-import { GiftDTO } from "../DTO";
-
-export type RandomGiftType = Omit<GiftDTO, 'id'>
+import { GetRandomGift } from "../../domain/useCases/gift";
 
 export interface GetRandomGiftProvider {
-  get(input: GiftPrice): Promise<RandomGiftType | undefined>;
+  get(input: GetRandomGift.Props): Promise<GetRandomGift.Result | undefined>;
 }
