@@ -1,17 +1,6 @@
 import { GetRandomGiftService } from "../../../../src/data/services/gift"
-import { GetRandomGift } from "../../../../src/domain/useCases/gift"
-import { HttpResponse, ok } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
+import { GetRandomGiftController } from "../../../../src/presentation/controllers/gift/get-random-gift"
 import { GetRandomGiftProviderSpy } from "../../../unit/domain/repositories/gift/get-random-gift"
-
-class GetRandomGiftController implements Controller {
-  constructor(private readonly getRandomGiftProvider: GetRandomGiftService) { }
-
-  async handle(): Promise<HttpResponse<GetRandomGift.Props>> {
-    const randomGift = await this.getRandomGiftProvider.execute({ min: 0, max: 100 })
-    return ok(randomGift)
-  }
-}
 
 type SutTypes = {
   sut: GetRandomGiftController
