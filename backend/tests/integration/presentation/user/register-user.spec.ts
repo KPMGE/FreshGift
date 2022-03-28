@@ -1,5 +1,5 @@
 import { RegisterUserService } from "../../../../src/data/services/user"
-import { MissingParameterError } from "../../../../src/domain/errors"
+import { InvalidEmailError, MissingParameterError, PasswordsDontMatchError } from "../../../../src/domain/errors"
 import { RegisterUser } from "../../../../src/domain/useCases/user"
 import { FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
 import { badRequest, HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
@@ -16,6 +16,7 @@ class RegisterUserController implements Controller {
       return ok(registeredUser)
     } catch (error) {
       if (error instanceof MissingParameterError) return badRequest(error.message)
+      if (error instanceof PasswordsDontMatchError) return badRequest(error.message)
       return serverError(error as Error)
     }
   }
@@ -56,6 +57,21 @@ describe('register-user-controller', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.data).toBeTruthy()
+  })
+
+  it('should return a badRequest password and confirmPassword don\'t match', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle({
+      ...fakeRequest, body: {
+        ...fakeNewUser,
+        password: 'any_password',
+        confirmPassword: 'other_password'
+      }
+    })
+
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('password and confirmPassword don\'t match')
   })
 
   it('should return a badRequest if no name is provided', async () => {
