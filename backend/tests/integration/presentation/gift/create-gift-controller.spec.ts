@@ -1,10 +1,11 @@
 import { SaveGiftRepository } from "../../../../src/data/contracts/gift"
 import { CreateGiftService } from "../../../../src/data/services/gift"
 import { MissingParameterError } from "../../../../src/domain/errors"
+import { CreateGift } from "../../../../src/domain/useCases/gift"
 import { FakeSaveGiftRepository } from "../../../../src/infra/repositories"
 import { HttpRequest, serverError } from "../../../../src/presentation/contracts"
 import { CreateGiftController } from "../../../../src/presentation/controllers"
-import { GiftViewModel } from "../../../../src/presentation/view-models"
+import { RandomIdGeneratorProviderStub } from "../../../unit/domain/providers"
 
 type SutTypes = {
   sut: CreateGiftController,
@@ -14,7 +15,8 @@ type SutTypes = {
 
 const makeSut = (): SutTypes => {
   const saveGiftRepository = new FakeSaveGiftRepository()
-  const createGiftService = new CreateGiftService(saveGiftRepository)
+  const randomIdGenerator = new RandomIdGeneratorProviderStub()
+  const createGiftService = new CreateGiftService(saveGiftRepository, randomIdGenerator)
   const sut = new CreateGiftController(createGiftService)
 
   return {
@@ -25,15 +27,14 @@ const makeSut = (): SutTypes => {
 }
 
 describe('create-gift-controller', () => {
-  const fakeGift: GiftViewModel = {
-    id: 'some_gift_id',
+  const fakeGift: CreateGift.Props = {
     name: 'some_gift_name',
     price: 100,
     imageUrl: 'some_image_url',
     description: 'some_description'
   }
 
-  const fakeRequest: HttpRequest<GiftViewModel> = {
+  const fakeRequest: HttpRequest<CreateGift.Props> = {
     body: fakeGift
   }
 
@@ -52,7 +53,7 @@ describe('create-gift-controller', () => {
     const response = await sut.handle(fakeRequest)
 
     expect(response).toBeTruthy()
-    expect(response.data).toEqual(fakeGift)
+    expect(response.data).toEqual({ ...fakeGift, id: 'any_valid_id' })
     expect(response.statusCode).toBe(200)
   })
 })

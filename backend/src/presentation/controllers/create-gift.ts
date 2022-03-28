@@ -6,7 +6,7 @@ import { GiftViewModel } from "../view-models"
 export class CreateGiftController implements Controller {
   constructor(private readonly createGiftService: CreateGift) { }
 
-  async handle(req?: HttpRequest<GiftViewModel>): Promise<HttpResponse<GiftViewModel>> {
+  async handle(req?: HttpRequest<CreateGift.Props>): Promise<HttpResponse<GiftViewModel>> {
     try {
       const createdGift = await this.createGiftService.execute(req?.body)
       return ok(createdGift)
