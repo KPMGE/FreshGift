@@ -1,24 +1,8 @@
 import { DeleteGiftService } from "../../../../src/data/services/gift"
 import { Gift } from "../../../../src/domain/entities"
-import { MissingParameterError } from "../../../../src/domain/errors"
-import { DeleteGift } from "../../../../src/domain/useCases/gift"
 import { FakeDeleteGiftRepository, FakeSaveGiftRepository } from "../../../../src/infra/repositories"
-import { HttpRequest, HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
-import { GiftViewModel } from "../../../../src/presentation/view-models"
-
-class DeleteGiftController implements Controller {
-  constructor(private readonly deleteGiftService: DeleteGift) { }
-
-  async handle(req?: HttpRequest<{ giftId: string }>): Promise<HttpResponse<GiftViewModel>> {
-    try {
-      const deletedGift = await this.deleteGiftService.execute(req?.body?.giftId)
-      return ok(deletedGift)
-    } catch (error) {
-      return serverError(error as Error)
-    }
-  }
-}
+import { HttpRequest, serverError } from "../../../../src/presentation/contracts"
+import { DeleteGiftController } from "../../../../src/presentation/controllers/gift/delete-gift"
 
 type SutTypes = {
   sut: DeleteGiftController
@@ -47,12 +31,12 @@ describe('delete-gift', () => {
     body: { giftId: 'any_gift_id' }
   }
 
-  it('should return serverError if service throws', async () => {
+  it('should return badRequest if wrong credentials are passed', async () => {
     const { sut } = makeSut()
     const response = await sut.handle({})
 
-    expect(response).toEqual(serverError(new MissingParameterError('id')))
-    expect(response.statusCode).toBe(500)
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Missing parameter: id')
   })
 
   it('should return a valid HttpResponse with a valid deletedGift', async () => {
