@@ -1,7 +1,7 @@
 import { RegisterUser } from "../../../domain/useCases/user";
 import { RegisterUserRepository } from "../../contracts/user";
 import { RandomIdGeneratorProvider, TokenGeneratorProvider } from "../../providers";
-import { MissingParameterError } from "../../../domain/errors";
+import { MissingParameterError, PasswordsDontMatchError } from "../../../domain/errors";
 import { UserDTO } from "../../DTO";
 
 export namespace RegisterUserService {
@@ -36,7 +36,7 @@ export class RegisterUserService implements RegisterUser {
     const isValidEmail = emailRegex.test(user.email);
     if (!isValidEmail) throw new Error();
 
-    if (user.password !== user.confirmPassword) throw new Error();
+    if (user.password !== user.confirmPassword) throw new PasswordsDontMatchError();
 
     const id = this.genereateIdProvider.generate();
     const newUser: UserDTO = {

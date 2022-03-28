@@ -1,6 +1,6 @@
 import { RandomIdGeneratorProvider } from "../../../../../src/data/providers"
 import { RegisterUserService } from "../../../../../src/data/services/user/register-user"
-import { MissingParameterError } from "../../../../../src/domain/errors"
+import { MissingParameterError, PasswordsDontMatchError } from "../../../../../src/domain/errors"
 import { RandomIdGeneratorProviderStub } from "../../providers"
 import { TokenGeneratorProviderSpy } from "../../providers/token-generator"
 import { RegisterUserRepositorySpy } from "../../repositories/user"
@@ -154,6 +154,6 @@ describe("register-user", () => {
       confirmPassword: "other_password",
     })
 
-    await expect(promise).rejects.toThrowError()
+    await expect(promise).rejects.toThrowError(new PasswordsDontMatchError())
   })
 })
