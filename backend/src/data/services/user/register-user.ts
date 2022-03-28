@@ -1,16 +1,26 @@
 import { RegisterUser } from "../../../domain/useCases/user";
 import { RegisterUserRepository } from "../../contracts/user";
 import { RandomIdGeneratorProvider } from "../../providers";
-import { UserDTO } from "../../DTO";
 import { MissingParameterError } from "../../../domain/errors";
+import { UserDTO } from "../../DTO";
+
+export namespace RegisterUserService {
+  export type Props = {
+    name: string
+    userName: string
+    email: string
+    password: string
+    confirmPassword: string
+  }
+}
 
 export class RegisterUserService implements RegisterUser {
   constructor(
     private readonly registerUserRepository: RegisterUserRepository,
     private readonly genereateIdProvider: RandomIdGeneratorProvider
-  ) {}
+  ) { }
 
-  async execute(user: UserDTO): Promise<void> {
+  async execute(user: RegisterUserService.Props): Promise<RegisterUser.Result> {
     if (!user.name) throw new MissingParameterError("name");
     if (!user.userName) throw new MissingParameterError("userName");
     if (!user.password) throw new MissingParameterError("password");
@@ -27,11 +37,20 @@ export class RegisterUserService implements RegisterUser {
     if (user.password !== user.confirmPassword) throw new Error();
 
     const id = this.genereateIdProvider.generate();
-    const newUser = {
+    const newUser: UserDTO = {
       ...user,
       id,
+      savedGifts: []
     };
 
     this.registerUserRepository.register(newUser);
+
+    return {
+      id,
+      name: user.name,
+      email: user.email,
+      userName: user.userName,
+      savedGifts: []
+    }
   }
 }

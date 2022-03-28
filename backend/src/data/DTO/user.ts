@@ -1,7 +1,3 @@
-export type UserDTO = {
-  name: string;
-  userName: string;
-  email: string;
-  password: string;
-  confirmPassword: string;
-}
+import { User } from "../../domain/entities";
+
+export type UserDTO = User

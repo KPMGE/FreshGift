@@ -1,4 +1,3 @@
-import { UserDTO } from "../../../../../src/data/DTO";
 import { RandomIdGeneratorProvider } from "../../../../../src/data/providers";
 import { RegisterUserService } from "../../../../../src/data/services/user/register-user";
 import { MissingParameterError } from "../../../../../src/domain/errors";
@@ -27,7 +26,7 @@ const makeSut = (): SutTypes => {
 };
 
 describe("register-user", () => {
-  const fakeUser: UserDTO = {
+  const fakeUser: RegisterUserService.Props = {
     name: "any_name",
     userName: "any_username",
     email: "validmail@gmail.com",
@@ -53,6 +52,7 @@ describe("register-user", () => {
     expect(registerUserRepository.user).toEqual({
       ...fakeUser,
       id: "any_valid_id",
+      savedGifts: []
     });
   });
 
