@@ -1,23 +1,7 @@
 import { ListGiftService } from "../../../../src/data/services/gift"
 import { Gift } from "../../../../src/domain/entities"
-import { ListGift } from "../../../../src/domain/useCases/gift"
 import { FakeListGiftRepository, FakeSaveGiftRepository } from "../../../../src/infra/repositories"
-import { HttpResponse, ok, serverError } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
-import { GiftViewModel } from "../../../../src/presentation/view-models"
-
-class ListGiftController implements Controller {
-  constructor(private readonly listGiftService: ListGift) { }
-
-  async handle(): Promise<HttpResponse<GiftViewModel[]>> {
-    try {
-      const gifts = await this.listGiftService.execute()
-      return ok(gifts)
-    } catch (error) {
-      return serverError(error as Error)
-    }
-  }
-}
+import { ListGiftController } from "../../../../src/presentation/controllers/gift"
 
 type SutTypes = {
   sut: ListGiftController
