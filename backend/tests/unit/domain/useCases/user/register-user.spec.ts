@@ -1,17 +1,9 @@
-import { RandomIdGeneratorProvider, TokenGeneratorProvider } from "../../../../../src/data/providers"
+import { RandomIdGeneratorProvider } from "../../../../../src/data/providers"
 import { RegisterUserService } from "../../../../../src/data/services/user/register-user"
 import { MissingParameterError } from "../../../../../src/domain/errors"
 import { RandomIdGeneratorProviderStub } from "../../providers"
+import { TokenGeneratorProviderSpy } from "../../providers/token-generator"
 import { RegisterUserRepositorySpy } from "../../repositories/user"
-
-class TokenGeneratorProviderSpy implements TokenGeneratorProvider {
-  input?: string
-
-  generate(userId: string): string {
-    this.input = userId
-    return 'any_token'
-  }
-}
 
 type SutTypes = {
   sut: RegisterUserService

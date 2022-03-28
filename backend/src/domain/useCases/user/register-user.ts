@@ -1,5 +1,5 @@
-import { User } from "../../entities";
+import { RegisterUserService } from "../../../data/services/user";
 
 export interface RegisterUser {
-  execute(user?: User): Promise<string>
+  execute(user?: RegisterUserService.Props): Promise<string>
 }
