@@ -1,29 +1,40 @@
-import { RandomIdGeneratorProvider } from "../../../../../src/data/providers";
-import { RegisterUserService } from "../../../../../src/data/services/user/register-user";
-import { MissingParameterError } from "../../../../../src/domain/errors";
-import { RandomIdGeneratorProviderStub } from "../../providers";
-import { RegisterUserRepositorySpy } from "../../repositories/user";
+import { RandomIdGeneratorProvider, TokenGeneratorProvider } from "../../../../../src/data/providers"
+import { RegisterUserService } from "../../../../../src/data/services/user/register-user"
+import { MissingParameterError } from "../../../../../src/domain/errors"
+import { RandomIdGeneratorProviderStub } from "../../providers"
+import { RegisterUserRepositorySpy } from "../../repositories/user"
+
+class TokenGeneratorProviderSpy implements TokenGeneratorProvider {
+  output?: string
+
+  generate(userId: string): string {
+    this.output = userId
+    return 'any_token'
+  }
+}
 
 type SutTypes = {
-  sut: RegisterUserService;
-  registerUserRepository: RegisterUserRepositorySpy;
-  genereateIdProvider: RandomIdGeneratorProvider;
-};
+  sut: RegisterUserService
+  registerUserRepository: RegisterUserRepositorySpy
+  genereateIdProvider: RandomIdGeneratorProvider
+}
 
 const makeSut = (): SutTypes => {
-  const registerUserRepository = new RegisterUserRepositorySpy();
-  const genereateIdProvider = new RandomIdGeneratorProviderStub();
+  const registerUserRepository = new RegisterUserRepositorySpy()
+  const genereateIdProvider = new RandomIdGeneratorProviderStub()
+  const tokenGeneratorProvider = new TokenGeneratorProviderSpy()
   const sut = new RegisterUserService(
     registerUserRepository,
-    genereateIdProvider
-  );
+    genereateIdProvider,
+    tokenGeneratorProvider
+  )
 
   return {
     sut,
     registerUserRepository,
     genereateIdProvider,
-  };
-};
+  }
+}
 
 describe("register-user", () => {
   const fakeUser: RegisterUserService.Props = {
@@ -32,97 +43,105 @@ describe("register-user", () => {
     email: "validmail@gmail.com",
     password: "any_password",
     confirmPassword: "any_password",
-  };
+  }
 
   describe("id generator provider", () => {
     it("should return a valid id", () => {
-      const { genereateIdProvider } = makeSut();
+      const { genereateIdProvider } = makeSut()
 
-      const id = genereateIdProvider.generate();
+      const id = genereateIdProvider.generate()
 
-      expect(id).toBeTruthy();
-    });
-  });
+      expect(id).toBeTruthy()
+    })
+  })
+
+  it("should return a string token", async () => {
+    const { sut } = makeSut()
+
+    const token = await sut.execute(fakeUser)
+
+    expect(token).toBe('any_token')
+  })
 
   it("should generate an id to the user and pass it to the repository", async () => {
-    const { sut, registerUserRepository } = makeSut();
+    const { sut, registerUserRepository } = makeSut()
 
-    await sut.execute(fakeUser);
+    await sut.execute(fakeUser)
 
     expect(registerUserRepository.user).toEqual({
       ...fakeUser,
       id: "any_valid_id",
       savedGifts: []
-    });
-  });
+    })
+  })
 
   it("should throw and error if the name field is not filled in", async () => {
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
-    const promise = sut.execute({ ...fakeUser, name: "" });
+    const promise = sut.execute({ ...fakeUser, name: "" })
 
     await expect(promise).rejects.toThrowError(
       new MissingParameterError("name")
-    );
-  });
+    )
+  })
 
   it("should throw and error if the userName field is not filled in", async () => {
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
-    const promise = sut.execute({ ...fakeUser, userName: "" });
+    const promise = sut.execute({ ...fakeUser, userName: "" })
 
     await expect(promise).rejects.toThrowError(
       new MissingParameterError("userName")
-    );
-  });
+    )
+  })
 
   it("should throw and error if the password field is not filled in", async () => {
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
-    const promise = sut.execute({ ...fakeUser, password: "" });
+    const promise = sut.execute({ ...fakeUser, password: "" })
 
     await expect(promise).rejects.toThrowError(
       new MissingParameterError("password")
-    );
-  });
+    )
+  })
 
   it("should throw and error if the confirmPassword field is not filled in", async () => {
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
-    const promise = sut.execute({ ...fakeUser, confirmPassword: "" });
+    const promise = sut.execute({ ...fakeUser, confirmPassword: "" })
 
     await expect(promise).rejects.toThrowError(
       new MissingParameterError("confirmPassword")
-    );
-  });
+    )
+  })
 
   it("should throw and error if the email field is not filled in", async () => {
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
-    const promise = sut.execute({ ...fakeUser, email: "" });
+    const promise = sut.execute({ ...fakeUser, email: "" })
 
     await expect(promise).rejects.toThrowError(
       new MissingParameterError("email")
-    );
-  });
+    )
+  })
 
   it("should throw and error if the email field is invalid", async () => {
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
-    const promise = sut.execute({ ...fakeUser, email: "invalid_email" });
+    const promise = sut.execute({ ...fakeUser, email: "invalid_email" })
 
-    await expect(promise).rejects.toThrowError();
-  });
+    await expect(promise).rejects.toThrowError()
+  })
 
   it("should throw and error password and confirmPassword don't match", async () => {
-    const { sut } = makeSut();
+    const { sut } = makeSut()
 
     const promise = sut.execute({
       ...fakeUser,
       password: "some_password",
       confirmPassword: "other_password",
-    });
+    })
 
-    await expect(promise).rejects.toThrowError();
-  });
-});
+    await expect(promise).rejects.toThrowError()
+  })
+})

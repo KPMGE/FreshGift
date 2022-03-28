@@ -1,6 +1,6 @@
 import { RegisterUser } from "../../../domain/useCases/user";
 import { RegisterUserRepository } from "../../contracts/user";
-import { RandomIdGeneratorProvider } from "../../providers";
+import { RandomIdGeneratorProvider, TokenGeneratorProvider } from "../../providers";
 import { MissingParameterError } from "../../../domain/errors";
 import { UserDTO } from "../../DTO";
 
@@ -17,10 +17,11 @@ export namespace RegisterUserService {
 export class RegisterUserService implements RegisterUser {
   constructor(
     private readonly registerUserRepository: RegisterUserRepository,
-    private readonly genereateIdProvider: RandomIdGeneratorProvider
+    private readonly genereateIdProvider: RandomIdGeneratorProvider,
+    private readonly tokenGeneratorProvider: TokenGeneratorProvider
   ) { }
 
-  async execute(user: RegisterUserService.Props): Promise<RegisterUser.Result> {
+  async execute(user: RegisterUserService.Props): Promise<string> {
     if (!user.name) throw new MissingParameterError("name");
     if (!user.userName) throw new MissingParameterError("userName");
     if (!user.password) throw new MissingParameterError("password");
@@ -45,12 +46,7 @@ export class RegisterUserService implements RegisterUser {
 
     this.registerUserRepository.register(newUser);
 
-    return {
-      id,
-      name: user.name,
-      email: user.email,
-      userName: user.userName,
-      savedGifts: []
-    }
+    const token = this.tokenGeneratorProvider.generate(id)
+    return token
   }
 }
