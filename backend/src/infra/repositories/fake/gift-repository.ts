@@ -21,8 +21,6 @@ export class FakeDeleteGiftRepository implements DeleteGiftRepository {
     const newList = listGifts.filter(gift => gift.id !== giftId)
     listGifts = newList
 
-    if (!foundGift) throw new Error('gift not found')
-
     return foundGift
   }
 }

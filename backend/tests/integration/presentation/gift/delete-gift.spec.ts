@@ -1,7 +1,7 @@
 import { DeleteGiftService } from "../../../../src/data/services/gift"
 import { Gift } from "../../../../src/domain/entities"
 import { FakeDeleteGiftRepository, FakeSaveGiftRepository } from "../../../../src/infra/repositories"
-import { HttpRequest, serverError } from "../../../../src/presentation/contracts"
+import { HttpRequest } from "../../../../src/presentation/contracts"
 import { DeleteGiftController } from "../../../../src/presentation/controllers/gift/delete-gift"
 
 type SutTypes = {
@@ -39,6 +39,15 @@ describe('delete-gift', () => {
     expect(response.data).toBe('Missing parameter: id')
   })
 
+  it('should return badRequest if wrong_gift_id is provided', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle({ body: { giftId: 'wrong_gift_id' } })
+
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Cannot delete gift')
+  })
+
   it('should return a valid HttpResponse with a valid deletedGift', async () => {
     const saveGiftRepository = new FakeSaveGiftRepository()
     await saveGiftRepository.save(fakeGift)
@@ -49,9 +58,5 @@ describe('delete-gift', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.data).toEqual(fakeGift)
-
-    response = await sut.handle(fakeRequest)
-
-    expect(response.statusCode).toBe(500)
   })
 })
