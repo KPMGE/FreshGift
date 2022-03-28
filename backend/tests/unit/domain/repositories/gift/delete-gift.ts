@@ -4,7 +4,7 @@ import { DeleteGiftRepository } from "../../../../../src/data/contracts/gift";
 export class DeleteGiftRepositorySpy implements DeleteGiftRepository {
   giftId?: string;
   callsCount = 0;
-  output: GiftDTO = {
+  output?: GiftDTO = {
     id: "any_gift_id",
     name: "any_gift_name",
     description: "any_gift_description",
@@ -12,7 +12,7 @@ export class DeleteGiftRepositorySpy implements DeleteGiftRepository {
     imageUrl: "any_gift_image",
   };
 
-  async delete(giftId: string): Promise<GiftDTO> {
+  async delete(giftId: string): Promise<GiftDTO | undefined> {
     this.callsCount++;
     this.giftId = giftId;
     return this.output;

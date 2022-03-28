@@ -1,6 +1,5 @@
-import { ListGiftRepository, SaveGiftRepository, UpdateGiftRepository } from '../../../data/contracts/gift'
+import { DeleteGiftRepository, ListGiftRepository, SaveGiftRepository, UpdateGiftRepository } from '../../../data/contracts/gift'
 import { GetGiftByIdRepository } from '../../../data/contracts/gift/get-gift-by-id-repository'
-import { DeleteUserRepository } from '../../../data/contracts/user'
 import { GiftDTO } from '../../../data/DTO'
 import { Gift } from '../../../domain/entities'
 import { GiftViewModel } from '../../../presentation/view-models'
@@ -15,8 +14,8 @@ export class FakeSaveGiftRepository implements SaveGiftRepository {
   }
 }
 
-export class FakeDeleteGiftRepository implements DeleteUserRepository {
-  async delete(giftId: string): Promise<Gift> {
+export class FakeDeleteGiftRepository implements DeleteGiftRepository {
+  async delete(giftId: string): Promise<Gift | undefined> {
     const foundGift = listGifts.find(gift => gift.id === giftId)
 
     const newList = listGifts.filter(gift => gift.id !== giftId)
