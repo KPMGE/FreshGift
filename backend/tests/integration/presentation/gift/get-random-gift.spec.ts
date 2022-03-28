@@ -13,12 +13,23 @@ class GetRandomGiftController implements Controller {
   }
 }
 
+type SutTypes = {
+  sut: GetRandomGiftController
+}
+
+const makeSut = (): SutTypes => {
+  const provider = new GetRandomGiftProviderStub()
+  const service = new GetRandomGiftService(provider)
+  const sut = new GetRandomGiftController(service)
+
+  return {
+    sut
+  }
+}
+
 describe('get-random-gift', () => {
   it('should return a random gift', async () => {
-    const provider = new GetRandomGiftProviderStub()
-    const service = new GetRandomGiftService(provider)
-    const sut = new GetRandomGiftController(service)
-
+    const { sut } = makeSut()
     const randomGift = await sut.handle()
 
     expect(randomGift).toBeTruthy()
