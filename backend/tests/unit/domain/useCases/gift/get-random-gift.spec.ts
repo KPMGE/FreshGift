@@ -1,13 +1,13 @@
 import { GetRandomGiftService } from "../../../../../src/data/services/gift"
-import { GetRandomGiftProviderStub } from "../../repositories/gift/get-random-gift"
+import { GetRandomGiftProviderSpy } from "../../repositories/gift/get-random-gift"
 
 type SutTypes = {
   sut: GetRandomGiftService,
-  getRandomGiftProvider: GetRandomGiftProviderStub
+  getRandomGiftProvider: GetRandomGiftProviderSpy
 }
 
 const makeSut = (): SutTypes => {
-  const getRandomGiftProvider = new GetRandomGiftProviderStub()
+  const getRandomGiftProvider = new GetRandomGiftProviderSpy()
   const sut = new GetRandomGiftService(getRandomGiftProvider)
 
   return {
@@ -16,8 +16,15 @@ const makeSut = (): SutTypes => {
   }
 }
 
-
 describe("get-random-gift", () => {
+  it('should call getRandomGiftprovider with right data', async () => {
+    const { sut, getRandomGiftProvider } = makeSut()
+
+    await sut.execute({ min: 0, max: 100 })
+
+    expect(getRandomGiftProvider.input).toEqual({ min: 0, max: 100 })
+  })
+
   it("should return a random gift inside the given range", async () => {
     const { sut } = makeSut()
 

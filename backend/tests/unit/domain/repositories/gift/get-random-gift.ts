@@ -1,7 +1,7 @@
 import { GetRandomGiftProvider } from "../../../../../src/data/providers/";
 import { GetRandomGift } from "../../../../../src/domain/useCases/gift";
 
-export class GetRandomGiftProviderStub implements GetRandomGiftProvider {
+export class GetRandomGiftProviderSpy implements GetRandomGiftProvider {
   input?: GetRandomGift.Props
   output?: GetRandomGift.Result = {
     name: 'any_name',
