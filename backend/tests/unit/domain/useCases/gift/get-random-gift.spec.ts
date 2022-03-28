@@ -6,12 +6,11 @@ describe("get-random-gift", () => {
     const getRandomGiftProvider = new GetRandomGiftProviderStub();
     const sut = new GetRandomGiftService(getRandomGiftProvider);
 
-    const gift = await sut.execute({ min: 0, max: 100 });
+    const gift = await sut.execute({ min: 0, max: 200 });
 
     expect(gift?.price).toBeGreaterThanOrEqual(0);
-    expect(gift?.price).toBeLessThanOrEqual(100);
+    expect(gift?.price).toBeLessThanOrEqual(200);
     expect(gift).toBeTruthy();
-    expect(gift).toHaveProperty("id");
     expect(gift).toHaveProperty("description");
     expect(gift).toHaveProperty("name");
     expect(gift).toHaveProperty("price");
