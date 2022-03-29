@@ -2,6 +2,7 @@ import { DeleteGiftRepository, ListGiftRepository, SaveGiftRepository, UpdateGif
 import { GetGiftByIdRepository } from '../../../data/contracts/gift/get-gift-by-id-repository'
 import { GiftDTO } from '../../../data/DTO'
 import { Gift } from '../../../domain/entities'
+import { UpdateGift } from '../../../domain/useCases/gift'
 import { GiftViewModel } from '../../../presentation/view-models'
 
 let listGifts: Gift[] = []
@@ -38,8 +39,19 @@ export class FakeGetGiftByIdRepository implements GetGiftByIdRepository {
 }
 
 export class FakeUpdateGiftRepository implements UpdateGiftRepository {
-  async update(giftId?: string): Promise<GiftDTO | undefined> {
+  async update(giftId?: string, newGift?: UpdateGift.Props): Promise<GiftDTO | undefined> {
     const foundGift = listGifts.find(gift => gift.id === giftId)
+    if (!newGift) return undefined
+    if (!foundGift) return undefined
+
+    const index = listGifts.indexOf(foundGift)
+
+    foundGift.name = newGift.name
+    foundGift.price = newGift.price
+    foundGift.imageUrl = newGift.imageUrl
+    foundGift.description = newGift.description
+    listGifts[index] = foundGift
+
     return foundGift
   }
 }

@@ -30,7 +30,7 @@ describe('get-gift-by-id', () => {
   it('should return resourceNotFoundError no gift is found', async () => {
     const { sut } = makeSut()
 
-    const gift = await sut.handle({ body: { giftId: 'invalid_gift_id' } })
+    const gift = await sut.handle({ params: { giftId: 'invalid_gift_id' } })
 
     expect(gift.statusCode).toBe(404)
     expect(gift.data).toBe('gift')
@@ -53,7 +53,7 @@ describe('get-gift-by-id', () => {
 
     const { sut } = makeSut()
 
-    const gift = await sut.handle({ body: { giftId: fakeGift.id } })
+    const gift = await sut.handle({ params: { giftId: fakeGift.id } })
 
     expect(gift.statusCode).toBe(200)
     expect(gift.data).toEqual(fakeGift)
