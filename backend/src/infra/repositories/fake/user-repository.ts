@@ -1,12 +1,31 @@
-import { DeleteUserRepository, RegisterUserRepository } from "../../../data/contracts/user";
+import { DeleteUserRepository, GetUserRepository, RegisterUserRepository } from "../../../data/contracts/user";
+import { ListUsersRepository } from "../../../data/contracts/user/list-users-repository";
 import { UserDTO } from "../../../data/DTO";
 import { User } from "../../../domain/entities";
+import { ListUser } from "../../../domain/useCases/user";
 
 let listUsers: UserDTO[] = []
+
+export class FakeListUsersRepository implements ListUsersRepository {
+  async list(): Promise<ListUser.Result[]> {
+    const result = listUsers.map(user => {
+      const { password, confirmPassword, ...result } = user // removes the properties password and confirmPassword 
+      return result
+    })
+
+    return result
+  }
+}
 
 export class FakeRegisterUserRepository implements RegisterUserRepository {
   async register(user: User): Promise<void> {
     listUsers.push(user)
+  }
+}
+
+export class FakeGetUserReposioty implements GetUserRepository {
+  async get(userId: string): Promise<User | undefined> {
+    return listUsers.find(user => user.id === userId)
   }
 }
 
