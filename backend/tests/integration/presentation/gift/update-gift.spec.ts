@@ -45,8 +45,10 @@ describe('update-gift', () => {
     const { sut } = makeSut()
 
     const response = await sut.handle({
-      body: {
+      params: {
         giftId: fakeGiftId,
+      },
+      body: {
         newGift: fakeNewGift
       }
     })
