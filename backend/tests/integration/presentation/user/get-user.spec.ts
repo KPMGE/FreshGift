@@ -1,23 +1,7 @@
 import { GetUserService } from "../../../../src/data/services/user/get-user"
-import { MissingParameterError } from "../../../../src/domain/errors"
-import { GetUser } from "../../../../src/domain/useCases/user"
 import { FakeGetUserReposioty, FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
-import { HttpRequest, HttpResponse, ok, resourceNotFoundError, serverError } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
-
-class GetUserController implements Controller {
-  constructor(private readonly getUserService: GetUser) { }
-
-  async handle(req?: HttpRequest): Promise<HttpResponse<GetUserService.Result>> {
-    try {
-      const foundUser = await this.getUserService.execute(req?.params.userId)
-      return ok(foundUser)
-    } catch (error) {
-      if (error instanceof MissingParameterError) return resourceNotFoundError(error.message)
-      return serverError(error as Error)
-    }
-  }
-}
+import { HttpRequest } from "../../../../src/presentation/contracts"
+import { GetUserController } from "../../../../src/presentation/controllers/user"
 
 type SutTypes = {
   sut: GetUserController
