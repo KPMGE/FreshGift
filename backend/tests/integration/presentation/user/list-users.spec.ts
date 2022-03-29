@@ -1,17 +1,6 @@
 import { ListUsersService } from "../../../../src/data/services/user"
-import { ListUser } from "../../../../src/domain/useCases/user"
 import { FakeListUsersRepository, FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
-import { HttpResponse, ok } from "../../../../src/presentation/contracts"
-import { Controller } from "../../../../src/presentation/contracts/controller"
-
-class ListUsersController implements Controller {
-  constructor(private readonly listUsersService: ListUser) { }
-
-  async handle(): Promise<HttpResponse<ListUser.Result[]>> {
-    const listUsers = await this.listUsersService.execute()
-    return ok(listUsers)
-  }
-}
+import { ListUsersController } from "../../../../src/presentation/controllers/user"
 
 type SutTypes = {
   sut: ListUsersController
