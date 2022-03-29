@@ -9,7 +9,7 @@ export class DeleteGiftController implements Controller {
 
   async handle(req?: HttpRequest<{ giftId: string }>): Promise<HttpResponse<GiftViewModel>> {
     try {
-      const deletedGift = await this.deleteGiftService.execute(req?.body?.giftId)
+      const deletedGift = await this.deleteGiftService.execute(req?.params?.giftId)
       return ok(deletedGift)
     } catch (error) {
       if (error instanceof MissingParameterError) return badRequest(error.message)

@@ -28,7 +28,7 @@ describe('delete-gift', () => {
   }
 
   const fakeRequest: HttpRequest<{ giftId: string }> = {
-    body: { giftId: 'any_gift_id' }
+    params: { giftId: 'any_gift_id' }
   }
 
   it('should return badRequest if wrong credentials are passed', async () => {
@@ -42,7 +42,7 @@ describe('delete-gift', () => {
   it('should return badRequest if wrong_gift_id is provided', async () => {
     const { sut } = makeSut()
 
-    const response = await sut.handle({ body: { giftId: 'wrong_gift_id' } })
+    const response = await sut.handle({ params: { giftId: 'wrong_gift_id' } })
 
     expect(response.statusCode).toBe(404)
     expect(response.data).toBe('Cannot delete gift')
