@@ -1,6 +1,6 @@
 import { ListUsersService } from "../../../../src/data/services/user"
 import { ListUser } from "../../../../src/domain/useCases/user"
-import { FakeListUsersRepository } from "../../../../src/infra/repositories/fake/user-repository"
+import { FakeListUsersRepository, FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
 import { HttpResponse, ok } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 
@@ -34,5 +34,31 @@ describe('list-users', () => {
 
     expect(response.statusCode).toBe(200)
     expect(response.data).toEqual([])
+  })
+
+  it('should return an HttpResponse with a valid list of usuer', async () => {
+    const registerUser = new FakeRegisterUserRepository()
+    await registerUser.register({
+      id: 'any_user_id',
+      name: 'any_name',
+      email: 'any_email@gmail.com',
+      password: 'any_password',
+      userName: 'any_username',
+      savedGifts: [],
+      confirmPassword: 'any_password'
+    })
+
+    const { sut } = makeSut()
+    const response = await sut.handle()
+
+    expect(response.statusCode).toBe(200)
+    expect(response.data.length).toBe(1)
+    expect(response.data[0]).toHaveProperty('id')
+    expect(response.data[0]).toHaveProperty('name')
+    expect(response.data[0]).toHaveProperty('userName')
+    expect(response.data[0]).toHaveProperty('email')
+    expect(response.data[0]).toHaveProperty('savedGifts')
+    expect(response.data[0]).not.toHaveProperty('password')
+    expect(response.data[0]).not.toHaveProperty('confirmPassword')
   })
 })
