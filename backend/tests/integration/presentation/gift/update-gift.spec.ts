@@ -48,9 +48,7 @@ describe('update-gift', () => {
       params: {
         giftId: fakeGiftId,
       },
-      body: {
-        newGift: fakeNewGift
-      }
+      body: fakeNewGift
     })
 
     expect(response.statusCode).toBe(200)
