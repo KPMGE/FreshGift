@@ -1,15 +1,21 @@
 import { GetUserService } from "../../../../src/data/services/user/get-user"
+import { MissingParameterError } from "../../../../src/domain/errors"
 import { GetUser } from "../../../../src/domain/useCases/user"
 import { FakeGetUserReposioty, FakeRegisterUserRepository } from "../../../../src/infra/repositories/fake/user-repository"
-import { HttpRequest, HttpResponse, ok } from "../../../../src/presentation/contracts"
+import { HttpRequest, HttpResponse, ok, resourceNotFoundError, serverError } from "../../../../src/presentation/contracts"
 import { Controller } from "../../../../src/presentation/contracts/controller"
 
 class GetUserController implements Controller {
   constructor(private readonly getUserService: GetUser) { }
 
   async handle(req?: HttpRequest): Promise<HttpResponse<GetUserService.Result>> {
-    const foundUser = await this.getUserService.execute(req?.params.userId)
-    return ok(foundUser)
+    try {
+      const foundUser = await this.getUserService.execute(req?.params.userId)
+      return ok(foundUser)
+    } catch (error) {
+      if (error instanceof MissingParameterError) return resourceNotFoundError(error.message)
+      return serverError(error as Error)
+    }
   }
 }
 
@@ -50,9 +56,18 @@ describe('get-user', () => {
   it('should return a valid user', async () => {
     const { sut } = makeSut()
 
-    const user = await sut.handle(fakeRequest)
+    const response = await sut.handle(fakeRequest)
 
-    expect(user.statusCode).toBe(200)
-    expect(user.data).toBeTruthy()
+    expect(response.statusCode).toBe(200)
+    expect(response.data).toBeTruthy()
+  })
+
+  it('should return badRequest if no userId is provided', async () => {
+    const { sut } = makeSut()
+
+    const response = await sut.handle()
+
+    expect(response.statusCode).toBe(404)
+    expect(response.data).toBe('Missing parameter: userId')
   })
 })
