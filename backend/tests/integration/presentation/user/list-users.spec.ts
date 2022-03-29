@@ -13,12 +13,23 @@ class ListUsersController implements Controller {
   }
 }
 
+type SutTypes = {
+  sut: ListUsersController
+}
+
+const makeSut = (): SutTypes => {
+  const repository = new FakeListUsersRepository()
+  const service = new ListUsersService(repository)
+  const sut = new ListUsersController(service)
+
+  return {
+    sut
+  }
+}
+
 describe('list-users', () => {
   it('should return a HttpResponse with an empty array if no users were registered', async () => {
-    const repository = new FakeListUsersRepository()
-    const service = new ListUsersService(repository)
-    const sut = new ListUsersController(service)
-
+    const { sut } = makeSut()
     const response = await sut.handle()
 
     expect(response.statusCode).toBe(200)
