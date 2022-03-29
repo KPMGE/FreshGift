@@ -17,20 +17,34 @@ class ListUsersRepositoryMock implements ListUsersRepository {
 
 
 class ListUsersService implements ListUser {
-  constructor(private readonly listUsersRepository: ListUsersRepositoryMock) { }
+  constructor(private readonly listUsersRepository: ListUsersRepository) { }
 
   async execute(): Promise<void> {
     await this.listUsersRepository.list()
   }
 }
 
+type SutTypes = {
+  sut: ListUsersService,
+  repositoryMock: ListUsersRepositoryMock
+}
+
+const makeSut = (): SutTypes => {
+  const repositoryMock = new ListUsersRepositoryMock()
+  const sut = new ListUsersService(repositoryMock)
+
+  return {
+    sut,
+    repositoryMock
+  }
+}
+
 describe('list-users', () => {
   it('should call repository only once', async () => {
-    const repository = new ListUsersRepositoryMock()
-    const sut = new ListUsersService(repository)
+    const { sut, repositoryMock } = makeSut()
 
     await sut.execute()
 
-    expect(repository.callsCount).toBe(1)
+    expect(repositoryMock.callsCount).toBe(1)
   })
 })
