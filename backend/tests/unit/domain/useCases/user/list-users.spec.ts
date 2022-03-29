@@ -1,24 +1,8 @@
-import { GiftDTO } from "../../../../../src/data/DTO"
-
-
-namespace ListUser {
-  export type Result = {
-    id: string
-    name: string
-    email: string
-    userName: string
-    savedGifts: GiftDTO[]
-  }
-}
-
-interface ListUser {
-  execute(): Promise<ListUser.Result[]>
-}
+import { ListUser } from "../../../../../src/domain/useCases/user"
 
 interface ListUsersRepository {
   list(): Promise<ListUser.Result[]>
 }
-
 
 class ListUsersRepositoryMock implements ListUsersRepository {
   callsCount = 0
