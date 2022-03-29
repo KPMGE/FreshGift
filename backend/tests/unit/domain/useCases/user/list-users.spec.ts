@@ -1,8 +1,6 @@
+import { ListUsersRepository } from "../../../../../src/data/contracts/user/list-users-repository"
+import { ListUsersService } from "../../../../../src/data/services/user"
 import { ListUser } from "../../../../../src/domain/useCases/user"
-
-interface ListUsersRepository {
-  list(): Promise<ListUser.Result[]>
-}
 
 class ListUsersRepositoryMock implements ListUsersRepository {
   callsCount = 0
@@ -22,13 +20,7 @@ class ListUsersRepositoryMock implements ListUsersRepository {
   }
 }
 
-class ListUsersService implements ListUser {
-  constructor(private readonly listUsersRepository: ListUsersRepository) { }
 
-  async execute(): Promise<ListUser.Result[]> {
-    return await this.listUsersRepository.list()
-  }
-}
 
 type SutTypes = {
   sut: ListUsersService,
