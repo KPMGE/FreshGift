@@ -70,7 +70,6 @@ describe('list-users', () => {
     expect(repositoryMock.callsCount).toBe(1)
   })
 
-
   it('should return and empty array if there is no users in the repository', async () => {
     const { sut, repositoryMock } = makeSut()
     repositoryMock.users = []
@@ -78,5 +77,17 @@ describe('list-users', () => {
     const users = await sut.execute()
 
     expect(users).toEqual([])
+  })
+
+  it('should return a list of valid users', async () => {
+    const { sut } = makeSut()
+
+    const users = await sut.execute()
+
+    expect(users[0]).toHaveProperty('id')
+    expect(users[0]).toHaveProperty('email')
+    expect(users[0]).toHaveProperty('name')
+    expect(users[0]).toHaveProperty('userName')
+    expect(users[0]).toHaveProperty('savedGifts')
   })
 })
