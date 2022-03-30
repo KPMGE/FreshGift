@@ -45,6 +45,24 @@ class AddAccountService implements AddAccountUseCase {
   }
 }
 
+type SutTypes = {
+  sut: AddAccountService,
+  addAccountRepositoryMock: AddAccountRespositoryMock,
+  hasherMock: HasherMock
+}
+
+const makeSut = (): SutTypes => {
+  const addAccountRepositoryMock = new AddAccountRespositoryMock()
+  const hasherMock = new HasherMock()
+  const sut = new AddAccountService(addAccountRepositoryMock, hasherMock)
+
+  return {
+    sut,
+    hasherMock,
+    addAccountRepositoryMock
+  }
+}
+
 describe('add-account', () => {
   const fakeAccount = {
     name: 'any_name',
@@ -53,22 +71,14 @@ describe('add-account', () => {
   }
 
   it('should call addAccountRepository with correct data', async () => {
-    const addAccountRepositoryMock = new AddAccountRespositoryMock()
-    const hasher = new HasherMock()
-    const sut = new AddAccountService(addAccountRepositoryMock, hasher)
-
+    const { sut, addAccountRepositoryMock } = makeSut()
     await sut.execute(fakeAccount)
-
     expect(addAccountRepositoryMock.input).toEqual(fakeAccount)
   })
 
   it('should call Hasher with correct data', async () => {
-    const addAccountRepositoryMock = new AddAccountRespositoryMock()
-    const hasher = new HasherMock()
-    const sut = new AddAccountService(addAccountRepositoryMock, hasher)
-
+    const { sut, hasherMock } = makeSut()
     await sut.execute(fakeAccount)
-
-    expect(hasher.input).toBe(fakeAccount.password)
+    expect(hasherMock.input).toBe(fakeAccount.password)
   })
 })
