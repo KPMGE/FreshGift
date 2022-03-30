@@ -7,7 +7,7 @@ namespace AddAccountUseCase {
 }
 
 interface AddAccountUseCase {
-  execute(account: AddAccountUseCase.Props): Promise<void>
+  execute(account: AddAccountUseCase.Props): Promise<boolean>
 }
 
 interface AddAccountRepository {
@@ -51,10 +51,11 @@ class AddAccountService implements AddAccountUseCase {
     private readonly hasher: Hasher,
     private readonly checkAccountByEmailRepository: CheckAccountByEmailRepository
   ) { }
-  async execute(account: AddAccountUseCase.Props): Promise<void> {
+  async execute(account: AddAccountUseCase.Props): Promise<boolean> {
     await this.addAccountRepository.add(account)
     await this.hasher.hash(account.password)
     await this.checkAccountByEmailRepository.check(account.email)
+    return true
   }
 }
 
@@ -102,5 +103,11 @@ describe('add-account', () => {
     const { sut, checkAccountByEmailRepositoryMock } = makeSut()
     await sut.execute(fakeAccount)
     expect(checkAccountByEmailRepositoryMock.input).toBe(fakeAccount.email)
+  })
+
+  it('should true on success', async () => {
+    const { sut } = makeSut()
+    const wasAccountCreated = await sut.execute(fakeAccount)
+    expect(wasAccountCreated).toBe(true)
   })
 })
