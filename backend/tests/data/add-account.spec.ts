@@ -10,7 +10,11 @@ interface AddAccountUseCase {
   execute(account: AddAccountUseCase.Props): Promise<void>
 }
 
-class AddAccountRespositoryMock {
+interface AddAccountRepository {
+  add(account: AddAccountUseCase.Props): Promise<void>
+}
+
+class AddAccountRespositoryMock implements AddAccountRepository {
   input: any
 
   async add(account: AddAccountUseCase.Props): Promise<void> {
@@ -18,7 +22,7 @@ class AddAccountRespositoryMock {
   }
 }
 
-class AddAccountService {
+class AddAccountService implements AddAccountUseCase {
   constructor(private readonly addAccountRepository: AddAccountRespositoryMock) { }
   async execute(account: AddAccountUseCase.Props): Promise<void> {
     await this.addAccountRepository.add(account)
