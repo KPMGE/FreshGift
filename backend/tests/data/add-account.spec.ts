@@ -136,4 +136,11 @@ describe('add-account', () => {
     const promise = sut.execute(fakeAccount)
     await expect(promise).rejects.toThrow()
   })
+
+  it('should throw if AddAccountRepository throws', async () => {
+    const { sut, addAccountRepositorySpy } = makeSut()
+    addAccountRepositorySpy.add = () => { throw new Error() }
+    const promise = sut.execute(fakeAccount)
+    await expect(promise).rejects.toThrow()
+  })
 })
