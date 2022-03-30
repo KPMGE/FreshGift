@@ -11,7 +11,7 @@ interface AddAccountUseCase {
 }
 
 interface AddAccountRepository {
-  add(account: AddAccountUseCase.Props): Promise<void>
+  add(account: AddAccountUseCase.Props): Promise<boolean>
 }
 
 interface Hasher {
@@ -19,14 +19,16 @@ interface Hasher {
 }
 
 interface CheckAccountByEmailRepository {
-  check(email: string): Promise<void>
+  check(email: string): Promise<boolean>
 }
 
-class AddAccountRespositoryMock implements AddAccountRepository {
-  input: any
+class AddAccountRepositorySpy implements AddAccountRepository {
+  input?: AddAccountUseCase.Props
+  output: boolean = true
 
-  async add(account: AddAccountUseCase.Props): Promise<void> {
+  async add(account: AddAccountUseCase.Props): Promise<boolean> {
     this.input = account
+    return this.output
   }
 }
 
@@ -38,10 +40,12 @@ class HasherMock implements Hasher {
   }
 }
 
-class CheckAccountByEmailRepositoryMock implements CheckAccountByEmailRepository {
+class CheckAccountByEmailRepositorySpy implements CheckAccountByEmailRepository {
   input?: string
-  async check(email: string): Promise<void> {
+  output: boolean = false
+  async check(email: string): Promise<boolean> {
     this.input = email
+    return this.output
   }
 }
 
@@ -52,31 +56,32 @@ class AddAccountService implements AddAccountUseCase {
     private readonly checkAccountByEmailRepository: CheckAccountByEmailRepository
   ) { }
   async execute(account: AddAccountUseCase.Props): Promise<boolean> {
-    await this.addAccountRepository.add(account)
+    const accountAlreadyExists = await this.checkAccountByEmailRepository.check(account.email)
+    if (accountAlreadyExists) return false
     await this.hasher.hash(account.password)
-    await this.checkAccountByEmailRepository.check(account.email)
-    return true
+    const wasAccountAdded = await this.addAccountRepository.add(account)
+    return wasAccountAdded
   }
 }
 
 type SutTypes = {
   sut: AddAccountService,
-  addAccountRepositoryMock: AddAccountRespositoryMock,
+  addAccountRepositorySpy: AddAccountRepositorySpy,
   hasherMock: HasherMock
-  checkAccountByEmailRepositoryMock: CheckAccountByEmailRepositoryMock
+  checkAccountByEmailRepositorySpy: CheckAccountByEmailRepositorySpy
 }
 
 const makeSut = (): SutTypes => {
-  const addAccountRepositoryMock = new AddAccountRespositoryMock()
+  const addAccountRepositorySpy = new AddAccountRepositorySpy()
   const hasherMock = new HasherMock()
-  const checkAccountByEmailRepositoryMock = new CheckAccountByEmailRepositoryMock()
-  const sut = new AddAccountService(addAccountRepositoryMock, hasherMock, checkAccountByEmailRepositoryMock)
+  const checkAccountByEmailRepositorySpy = new CheckAccountByEmailRepositorySpy()
+  const sut = new AddAccountService(addAccountRepositorySpy, hasherMock, checkAccountByEmailRepositorySpy)
 
   return {
     sut,
     hasherMock,
-    addAccountRepositoryMock,
-    checkAccountByEmailRepositoryMock
+    addAccountRepositorySpy,
+    checkAccountByEmailRepositorySpy
   }
 }
 
@@ -88,9 +93,9 @@ describe('add-account', () => {
   }
 
   it('should call addAccountRepository with correct data', async () => {
-    const { sut, addAccountRepositoryMock } = makeSut()
+    const { sut, addAccountRepositorySpy } = makeSut()
     await sut.execute(fakeAccount)
-    expect(addAccountRepositoryMock.input).toEqual(fakeAccount)
+    expect(addAccountRepositorySpy.input).toEqual(fakeAccount)
   })
 
   it('should call Hasher with correct data', async () => {
@@ -100,14 +105,21 @@ describe('add-account', () => {
   })
 
   it('should call CheckAccountByEmailRepository with correct data', async () => {
-    const { sut, checkAccountByEmailRepositoryMock } = makeSut()
+    const { sut, checkAccountByEmailRepositorySpy } = makeSut()
     await sut.execute(fakeAccount)
-    expect(checkAccountByEmailRepositoryMock.input).toBe(fakeAccount.email)
+    expect(checkAccountByEmailRepositorySpy.input).toBe(fakeAccount.email)
   })
 
-  it('should true on success', async () => {
+  it('should return true on success', async () => {
     const { sut } = makeSut()
     const wasAccountCreated = await sut.execute(fakeAccount)
     expect(wasAccountCreated).toBe(true)
+  })
+
+  it('should return false if CheckAccountByEmailRepository retuns true', async () => {
+    const { sut, checkAccountByEmailRepositorySpy } = makeSut()
+    checkAccountByEmailRepositorySpy.output = true
+    const wasAccountCreated = await sut.execute(fakeAccount)
+    expect(wasAccountCreated).toBe(false)
   })
 })
