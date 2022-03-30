@@ -122,4 +122,18 @@ describe('add-account', () => {
     const wasAccountCreated = await sut.execute(fakeAccount)
     expect(wasAccountCreated).toBe(false)
   })
+
+  it('should return false if AddAccountRepository retuns false', async () => {
+    const { sut, addAccountRepositorySpy } = makeSut()
+    addAccountRepositorySpy.output = false
+    const wasAccountCreated = await sut.execute(fakeAccount)
+    expect(wasAccountCreated).toBe(false)
+  })
+
+  it('should throw if Hasher throws', async () => {
+    const { sut, hasherMock } = makeSut()
+    hasherMock.hash = () => { throw new Error() }
+    const promise = sut.execute(fakeAccount)
+    await expect(promise).rejects.toThrow()
+  })
 })
