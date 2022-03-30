@@ -36,8 +36,8 @@ class HasherMock implements Hasher {
 
 class AddAccountService implements AddAccountUseCase {
   constructor(
-    private readonly addAccountRepository: AddAccountRespositoryMock,
-    private readonly hasher: HasherMock
+    private readonly addAccountRepository: AddAccountRepository,
+    private readonly hasher: Hasher
   ) { }
   async execute(account: AddAccountUseCase.Props): Promise<void> {
     await this.addAccountRepository.add(account)
