@@ -15,7 +15,7 @@ interface AddAccountRepository {
 }
 
 interface Hasher {
-  hash(plainText: string): Promise<void>
+  hash(plainText: string): Promise<string>
 }
 
 interface CheckAccountByEmailRepository {
@@ -32,11 +32,13 @@ class AddAccountRepositorySpy implements AddAccountRepository {
   }
 }
 
-class HasherMock implements Hasher {
+class HasherSpy implements Hasher {
   input?: string
+  output: string = 'hashed_password'
 
-  async hash(plainText: string): Promise<void> {
+  async hash(plainText: string): Promise<string> {
     this.input = plainText
+    return this.output
   }
 }
 
@@ -58,8 +60,8 @@ class AddAccountService implements AddAccountUseCase {
   async execute(account: AddAccountUseCase.Props): Promise<boolean> {
     const accountAlreadyExists = await this.checkAccountByEmailRepository.check(account.email)
     if (accountAlreadyExists) return false
-    await this.hasher.hash(account.password)
-    const wasAccountAdded = await this.addAccountRepository.add(account)
+    const hashedPassword = await this.hasher.hash(account.password)
+    const wasAccountAdded = await this.addAccountRepository.add({ ...account, password: hashedPassword })
     return wasAccountAdded
   }
 }
@@ -67,19 +69,19 @@ class AddAccountService implements AddAccountUseCase {
 type SutTypes = {
   sut: AddAccountService,
   addAccountRepositorySpy: AddAccountRepositorySpy,
-  hasherMock: HasherMock
+  hasherSpy: HasherSpy
   checkAccountByEmailRepositorySpy: CheckAccountByEmailRepositorySpy
 }
 
 const makeSut = (): SutTypes => {
   const addAccountRepositorySpy = new AddAccountRepositorySpy()
-  const hasherMock = new HasherMock()
+  const hasherSpy = new HasherSpy()
   const checkAccountByEmailRepositorySpy = new CheckAccountByEmailRepositorySpy()
-  const sut = new AddAccountService(addAccountRepositorySpy, hasherMock, checkAccountByEmailRepositorySpy)
+  const sut = new AddAccountService(addAccountRepositorySpy, hasherSpy, checkAccountByEmailRepositorySpy)
 
   return {
     sut,
-    hasherMock,
+    hasherSpy,
     addAccountRepositorySpy,
     checkAccountByEmailRepositorySpy
   }
@@ -95,13 +97,13 @@ describe('add-account', () => {
   it('should call addAccountRepository with correct data', async () => {
     const { sut, addAccountRepositorySpy } = makeSut()
     await sut.execute(fakeAccount)
-    expect(addAccountRepositorySpy.input).toEqual(fakeAccount)
+    expect(addAccountRepositorySpy.input).toEqual({ ...fakeAccount, password: 'hashed_password' })
   })
 
   it('should call Hasher with correct data', async () => {
-    const { sut, hasherMock } = makeSut()
+    const { sut, hasherSpy } = makeSut()
     await sut.execute(fakeAccount)
-    expect(hasherMock.input).toBe(fakeAccount.password)
+    expect(hasherSpy.input).toBe(fakeAccount.password)
   })
 
   it('should call CheckAccountByEmailRepository with correct data', async () => {
@@ -131,8 +133,8 @@ describe('add-account', () => {
   })
 
   it('should throw if Hasher throws', async () => {
-    const { sut, hasherMock } = makeSut()
-    hasherMock.hash = () => { throw new Error() }
+    const { sut, hasherSpy } = makeSut()
+    hasherSpy.hash = () => { throw new Error() }
     const promise = sut.execute(fakeAccount)
     await expect(promise).rejects.toThrow()
   })
