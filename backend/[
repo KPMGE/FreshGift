@@ -14,10 +14,6 @@ interface AddAccountRepository {
   add(account: AddAccountUseCase.Props): Promise<void>
 }
 
-interface Hasher {
-  hash(plainText: string): Promise<void>
-}
-
 class AddAccountRespositoryMock implements AddAccountRepository {
   input: any
 
@@ -26,22 +22,17 @@ class AddAccountRespositoryMock implements AddAccountRepository {
   }
 }
 
-class HasherMock implements Hasher {
-  input?: string
-
-  async hash(plainText: string): Promise<void> {
-    this.input = plainText
+class HasherMock {
+  input: any
+  async hash(value: any): Promise<void> {
+    this.input = value
   }
 }
 
 class AddAccountService implements AddAccountUseCase {
-  constructor(
-    private readonly addAccountRepository: AddAccountRespositoryMock,
-    private readonly hasher: HasherMock
-  ) { }
+  constructor(private readonly addAccountRepository: AddAccountRespositoryMock) { }
   async execute(account: AddAccountUseCase.Props): Promise<void> {
     await this.addAccountRepository.add(account)
-    await this.hasher.hash(account.password)
   }
 }
 
@@ -54,8 +45,7 @@ describe('add-account', () => {
 
   it('should call addAccountRepository with correct data', async () => {
     const addAccountRepositoryMock = new AddAccountRespositoryMock()
-    const hasher = new HasherMock()
-    const sut = new AddAccountService(addAccountRepositoryMock, hasher)
+    const sut = new AddAccountService(addAccountRepositoryMock)
 
     await sut.execute(fakeAccount)
 
