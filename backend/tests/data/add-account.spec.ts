@@ -1,18 +1,26 @@
+namespace AddAccountUseCase {
+  export type Props = {
+    name: string,
+    email: string,
+    password: string
+  }
+}
+
 interface AddAccountUseCase {
-  execute(account: { name: string, email: string, password: string }): Promise<void>
+  execute(account: AddAccountUseCase.Props): Promise<void>
 }
 
 class AddAccountRespositoryMock {
   input: any
 
-  async add(account: { name: string, email: string, password: string }): Promise<void> {
+  async add(account: AddAccountUseCase.Props): Promise<void> {
     this.input = account
   }
 }
 
 class AddAccountService {
   constructor(private readonly addAccountRepository: AddAccountRespositoryMock) { }
-  async execute(account: { name: string, email: string, password: string }): Promise<void> {
+  async execute(account: AddAccountUseCase.Props): Promise<void> {
     await this.addAccountRepository.add(account)
   }
 }
