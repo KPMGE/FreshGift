@@ -18,6 +18,10 @@ interface Hasher {
   hash(plainText: string): Promise<void>
 }
 
+interface CheckAccountByEmailRepository {
+  check(email: string): Promise<void>
+}
+
 class AddAccountRespositoryMock implements AddAccountRepository {
   input: any
 
@@ -34,14 +38,23 @@ class HasherMock implements Hasher {
   }
 }
 
+class CheckAccountByEmailRepositoryMock implements CheckAccountByEmailRepository {
+  input?: string
+  async check(email: string): Promise<void> {
+    this.input = email
+  }
+}
+
 class AddAccountService implements AddAccountUseCase {
   constructor(
     private readonly addAccountRepository: AddAccountRepository,
-    private readonly hasher: Hasher
+    private readonly hasher: Hasher,
+    private readonly checkAccountByEmailRepository: CheckAccountByEmailRepository
   ) { }
   async execute(account: AddAccountUseCase.Props): Promise<void> {
     await this.addAccountRepository.add(account)
     await this.hasher.hash(account.password)
+    await this.checkAccountByEmailRepository.check(account.email)
   }
 }
 
@@ -49,17 +62,20 @@ type SutTypes = {
   sut: AddAccountService,
   addAccountRepositoryMock: AddAccountRespositoryMock,
   hasherMock: HasherMock
+  checkAccountByEmailRepositoryMock: CheckAccountByEmailRepositoryMock
 }
 
 const makeSut = (): SutTypes => {
   const addAccountRepositoryMock = new AddAccountRespositoryMock()
   const hasherMock = new HasherMock()
-  const sut = new AddAccountService(addAccountRepositoryMock, hasherMock)
+  const checkAccountByEmailRepositoryMock = new CheckAccountByEmailRepositoryMock()
+  const sut = new AddAccountService(addAccountRepositoryMock, hasherMock, checkAccountByEmailRepositoryMock)
 
   return {
     sut,
     hasherMock,
-    addAccountRepositoryMock
+    addAccountRepositoryMock,
+    checkAccountByEmailRepositoryMock
   }
 }
 
@@ -80,5 +96,11 @@ describe('add-account', () => {
     const { sut, hasherMock } = makeSut()
     await sut.execute(fakeAccount)
     expect(hasherMock.input).toBe(fakeAccount.password)
+  })
+
+  it('should call CheckAccountByEmailRepository with correct data', async () => {
+    const { sut, checkAccountByEmailRepositoryMock } = makeSut()
+    await sut.execute(fakeAccount)
+    expect(checkAccountByEmailRepositoryMock.input).toBe(fakeAccount.email)
   })
 })
