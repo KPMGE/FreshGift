@@ -26,7 +26,7 @@ interface LoadAccountByEmailRepository {
 }
 
 interface HashComparer {
-  compare(plainText: string, hashedInfo: string): Promise<void>
+  compare(plainText: string, hashedInfo: string): Promise<boolean>
 }
 
 class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
@@ -42,12 +42,14 @@ class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
   }
 }
 
-class HashComparerMock implements HashComparer {
+class HashComparerSpy implements HashComparer {
   plainText?: string
   hashedInfo?: string
-  async compare(plainText: string, hashedInfo: string): Promise<void> {
+  output: boolean = true
+  async compare(plainText: string, hashedInfo: string): Promise<boolean> {
     this.plainText = plainText
     this.hashedInfo = hashedInfo
+    return this.output
   }
 }
 
@@ -59,25 +61,26 @@ class AuthenticationService {
   async execute({ email, password }: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result> {
     const account = await this.loadAccountByEmailRepository.load(email)
     if (!account) return null
-    await this.hashComparer.compare(password, account.password)
+    const isPasswordCorrect = await this.hashComparer.compare(password, account.password)
+    if (!isPasswordCorrect) return null
   }
 }
 
 type SutTypes = {
   sut: AuthenticationService,
   loadAccountByEmailRepositorySpy: LoadAccountByEmailRepositorySpy
-  hashComparerMock: HashComparerMock
+  hashComparerSpy: HashComparerSpy
 }
 
 const makeSut = (): SutTypes => {
   const loadAccountByEmailRepositorySpy = new LoadAccountByEmailRepositorySpy()
-  const hashComparerMock = new HashComparerMock()
-  const sut = new AuthenticationService(loadAccountByEmailRepositorySpy, hashComparerMock)
+  const hashComparerSpy = new HashComparerSpy()
+  const sut = new AuthenticationService(loadAccountByEmailRepositorySpy, hashComparerSpy)
 
   return {
     sut,
     loadAccountByEmailRepositorySpy,
-    hashComparerMock
+    hashComparerSpy
   }
 }
 
@@ -108,16 +111,23 @@ describe('authentication', () => {
   })
 
   it('should call hashComparer with right data', async () => {
-    const { sut, hashComparerMock, loadAccountByEmailRepositorySpy } = makeSut()
+    const { sut, hashComparerSpy, loadAccountByEmailRepositorySpy } = makeSut()
     await sut.execute(fakeInput)
-    expect(hashComparerMock.plainText).toBe(fakeInput.password)
-    expect(hashComparerMock.hashedInfo).toBe(loadAccountByEmailRepositorySpy.output.password)
+    expect(hashComparerSpy.plainText).toBe(fakeInput.password)
+    expect(hashComparerSpy.hashedInfo).toBe(loadAccountByEmailRepositorySpy.output.password)
   })
 
   it('should throw if HashComparer throws', async () => {
-    const { sut, hashComparerMock } = makeSut()
-    hashComparerMock.compare = () => { throw new Error() }
+    const { sut, hashComparerSpy } = makeSut()
+    hashComparerSpy.compare = () => { throw new Error() }
     const promise = sut.execute(fakeInput)
     expect(promise).rejects.toThrow()
+  })
+
+  it('should return null if HashComparer returns false', async () => {
+    const { sut, hashComparerSpy } = makeSut()
+    hashComparerSpy.output = false
+    const result = await sut.execute(fakeInput)
+    expect(result).toBeNull()
   })
 })
