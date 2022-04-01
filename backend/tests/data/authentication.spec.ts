@@ -1,7 +1,7 @@
 import { LoadAccountByEmailRepository, UpdateTokenRepository } from "../../src/data/contracts"
 import { Encrypter } from "../../src/data/providers"
 import { HashComparer } from "../../src/data/providers/hash-comparer"
-import { AuthenticationUseCase } from "../../src/domain/useCases"
+import { AuthenticationService } from "../../src/data/services"
 
 class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
   input?: string
@@ -45,26 +45,7 @@ class UpdateTokenRepositoryMock implements UpdateTokenRepository {
   }
 }
 
-class AuthenticationService {
-  constructor(
-    private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository,
-    private readonly hashComparer: HashComparer,
-    private readonly encrypter: Encrypter,
-    private readonly updateTokenRepository: UpdateTokenRepository
-  ) { }
-  async execute({ email, password }: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result> {
-    const account = await this.loadAccountByEmailRepository.load(email)
-    if (!account) return null
-    const isPasswordCorrect = await this.hashComparer.compare(password, account.password)
-    if (!isPasswordCorrect) return null
-    const accessToken = await this.encrypter.encrypt(account.password)
-    await this.updateTokenRepository.update(account.id, accessToken)
-    return {
-      accessToken,
-      name: account.name
-    }
-  }
-}
+
 
 type SutTypes = {
   sut: AuthenticationService,
