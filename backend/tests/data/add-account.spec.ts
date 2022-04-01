@@ -1,18 +1,7 @@
 import { AddAccountRepository, CheckAccountByEmailRepository } from "../../src/data/contracts"
 import { Hasher } from "../../src/data/providers"
 import { AddAccountService } from "../../src/data/services"
-import { AddAccountUseCase } from "../../src/domain/useCases"
-
-
-class AddAccountRepositorySpy implements AddAccountRepository {
-  input?: AddAccountUseCase.Props
-  output: boolean = true
-
-  async add(account: AddAccountUseCase.Props): Promise<boolean> {
-    this.input = account
-    return this.output
-  }
-}
+import { AddAccountRepositorySpy } from "./mocks"
 
 class HasherSpy implements Hasher {
   input?: string
