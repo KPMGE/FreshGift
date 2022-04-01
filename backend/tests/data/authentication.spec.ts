@@ -29,6 +29,10 @@ interface HashComparer {
   compare(plainText: string, hashedInfo: string): Promise<boolean>
 }
 
+interface Encrypter {
+  encrypt(plainText: string): Promise<void>
+}
+
 class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
   input?: string
   output = {
@@ -53,16 +57,25 @@ class HashComparerSpy implements HashComparer {
   }
 }
 
+class EncrypterMock implements Encrypter {
+  plainText?: string
+  async encrypt(plainText: string): Promise<void> {
+    this.plainText = plainText
+  }
+}
+
 class AuthenticationService {
   constructor(
     private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository,
-    private readonly hashComparer: HashComparer
+    private readonly hashComparer: HashComparer,
+    private readonly encrypter: Encrypter
   ) { }
   async execute({ email, password }: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result> {
     const account = await this.loadAccountByEmailRepository.load(email)
     if (!account) return null
     const isPasswordCorrect = await this.hashComparer.compare(password, account.password)
     if (!isPasswordCorrect) return null
+    await this.encrypter.encrypt(account.password)
   }
 }
 
@@ -70,17 +83,20 @@ type SutTypes = {
   sut: AuthenticationService,
   loadAccountByEmailRepositorySpy: LoadAccountByEmailRepositorySpy
   hashComparerSpy: HashComparerSpy
+  encrypterMock: EncrypterMock
 }
 
 const makeSut = (): SutTypes => {
   const loadAccountByEmailRepositorySpy = new LoadAccountByEmailRepositorySpy()
   const hashComparerSpy = new HashComparerSpy()
-  const sut = new AuthenticationService(loadAccountByEmailRepositorySpy, hashComparerSpy)
+  const encrypterMock = new EncrypterMock()
+  const sut = new AuthenticationService(loadAccountByEmailRepositorySpy, hashComparerSpy, encrypterMock)
 
   return {
     sut,
     loadAccountByEmailRepositorySpy,
-    hashComparerSpy
+    hashComparerSpy,
+    encrypterMock
   }
 }
 
@@ -129,5 +145,11 @@ describe('authentication', () => {
     hashComparerSpy.output = false
     const result = await sut.execute(fakeInput)
     expect(result).toBeNull()
+  })
+
+  it('should call encrypter with right data', async () => {
+    const { sut, encrypterMock, loadAccountByEmailRepositorySpy } = makeSut()
+    await sut.execute(fakeInput)
+    expect(encrypterMock.plainText).toBe(loadAccountByEmailRepositorySpy.output.password)
   })
 })
