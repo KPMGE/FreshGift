@@ -152,4 +152,11 @@ describe('authentication', () => {
     await sut.execute(fakeInput)
     expect(encrypterMock.plainText).toBe(loadAccountByEmailRepositorySpy.output.password)
   })
+
+  it('should throw if encrypter throws', async () => {
+    const { sut, encrypterMock } = makeSut()
+    encrypterMock.encrypt = () => { throw new Error() }
+    const promise = sut.execute(fakeInput)
+    await expect(promise).rejects.toThrow()
+  })
 })
