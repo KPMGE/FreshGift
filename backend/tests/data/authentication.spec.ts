@@ -1,11 +1,7 @@
-import { LoadAccountByEmailRepository } from "../../src/data/contracts"
+import { LoadAccountByEmailRepository, UpdateTokenRepository } from "../../src/data/contracts"
 import { Encrypter } from "../../src/data/providers"
 import { HashComparer } from "../../src/data/providers/hash-comparer"
 import { AuthenticationUseCase } from "../../src/domain/useCases"
-
-interface UpdateTokenRepository {
-  update(id: string, token: string): Promise<void>
-}
 
 class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
   input?: string
