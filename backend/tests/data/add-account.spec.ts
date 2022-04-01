@@ -1,15 +1,5 @@
-import { CheckAccountByEmailRepository } from "../../src/data/contracts"
 import { AddAccountService } from "../../src/data/services"
-import { AddAccountRepositorySpy, HasherSpy } from "./mocks"
-
-class CheckAccountByEmailRepositorySpy implements CheckAccountByEmailRepository {
-  input?: string
-  output: boolean = false
-  async check(email: string): Promise<boolean> {
-    this.input = email
-    return this.output
-  }
-}
+import { AddAccountRepositorySpy, CheckAccountByEmailRepositorySpy, HasherSpy } from "./mocks"
 
 type SutTypes = {
   sut: AddAccountService,
