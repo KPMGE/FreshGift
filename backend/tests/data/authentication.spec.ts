@@ -1,16 +1,7 @@
 import { UpdateTokenRepository } from "../../src/data/contracts"
-import { Encrypter } from "../../src/data/providers"
 import { AuthenticationService } from "../../src/data/services"
-import { LoadAccountByEmailRepositorySpy, HashComparerSpy } from "./mocks"
+import { LoadAccountByEmailRepositorySpy, HashComparerSpy, EncrypterSpy } from "./mocks"
 
-class EncrypterSpy implements Encrypter {
-  plainText?: string
-  output = 'some_token'
-  async encrypt(plainText: string): Promise<string> {
-    this.plainText = plainText
-    return this.output
-  }
-}
 
 class UpdateTokenRepositoryMock implements UpdateTokenRepository {
   id?: string
