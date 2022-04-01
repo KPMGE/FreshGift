@@ -1,16 +1,5 @@
+import { LoadAccountByEmailRepository } from "../../src/data/contracts"
 import { AuthenticationUseCase } from "../../src/domain/useCases"
-
-namespace LoadAccountByEmailRepository {
-  export type Result = {
-    id: string
-    name: string
-    password: string
-  }
-}
-
-interface LoadAccountByEmailRepository {
-  load(email: string): Promise<LoadAccountByEmailRepository.Result>
-}
 
 interface HashComparer {
   compare(plainText: string, hashedInfo: string): Promise<boolean>
