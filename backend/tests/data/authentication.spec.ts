@@ -191,6 +191,13 @@ describe('authentication', () => {
     expect(updateTokenRepositoryMock.token).toBe(encrypterSpy.output)
   })
 
+  it('should throw if UpdateTokenRepository throws', async () => {
+    const { sut, updateTokenRepositoryMock } = makeSut()
+    updateTokenRepositoryMock.update = () => { throw new Error() }
+    const promise = sut.execute(fakeInput)
+    expect(promise).rejects.toThrow()
+  })
+
   it('should return accessToken and name on success', async () => {
     const { sut, loadAccountByEmailRepositorySpy, encrypterSpy } = makeSut()
     const result = await sut.execute(fakeInput)
