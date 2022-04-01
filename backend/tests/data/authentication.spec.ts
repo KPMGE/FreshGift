@@ -113,4 +113,11 @@ describe('authentication', () => {
     expect(hashComparerMock.plainText).toBe(fakeInput.password)
     expect(hashComparerMock.hashedInfo).toBe(loadAccountByEmailRepositorySpy.output.password)
   })
+
+  it('should throw if HashComparer throws', async () => {
+    const { sut, hashComparerMock } = makeSut()
+    hashComparerMock.compare = () => { throw new Error() }
+    const promise = sut.execute(fakeInput)
+    expect(promise).rejects.toThrow()
+  })
 })
