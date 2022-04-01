@@ -1,16 +1,5 @@
-import { UpdateTokenRepository } from "../../src/data/contracts"
 import { AuthenticationService } from "../../src/data/services"
-import { LoadAccountByEmailRepositorySpy, HashComparerSpy, EncrypterSpy } from "./mocks"
-
-
-class UpdateTokenRepositoryMock implements UpdateTokenRepository {
-  id?: string
-  token?: string
-  async update(id: string, token: string): Promise<void> {
-    this.id = id
-    this.token = token
-  }
-}
+import { LoadAccountByEmailRepositorySpy, HashComparerSpy, EncrypterSpy, UpdateTokenRepositoryMock } from "./mocks"
 
 type SutTypes = {
   sut: AuthenticationService,
