@@ -1,9 +1,6 @@
 import { LoadAccountByEmailRepository } from "../../src/data/contracts"
+import { HashComparer } from "../../src/data/providers/hash-comparer"
 import { AuthenticationUseCase } from "../../src/domain/useCases"
-
-interface HashComparer {
-  compare(plainText: string, hashedInfo: string): Promise<boolean>
-}
 
 interface Encrypter {
   encrypt(plainText: string): Promise<string>
