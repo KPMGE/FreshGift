@@ -1,20 +1,8 @@
-import { LoadAccountByEmailRepository, UpdateTokenRepository } from "../../src/data/contracts"
+import { UpdateTokenRepository } from "../../src/data/contracts"
 import { Encrypter } from "../../src/data/providers"
 import { HashComparer } from "../../src/data/providers/hash-comparer"
 import { AuthenticationService } from "../../src/data/services"
-
-class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
-  input?: string
-  output = {
-    id: 'any_id',
-    password: 'any_password',
-    name: 'any_name'
-  }
-  async load(email: string): Promise<LoadAccountByEmailRepository.Result> {
-    this.input = email
-    return this.output
-  }
-}
+import { LoadAccountByEmailRepositorySpy } from "./mocks/load-account-by-email"
 
 class HashComparerSpy implements HashComparer {
   plainText?: string
@@ -44,8 +32,6 @@ class UpdateTokenRepositoryMock implements UpdateTokenRepository {
     this.token = token
   }
 }
-
-
 
 type SutTypes = {
   sut: AuthenticationService,
