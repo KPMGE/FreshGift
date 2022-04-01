@@ -1,13 +1,4 @@
-namespace AuthenticationUseCase {
-  export type Props = {
-    password: string
-    email: string
-  }
-  export type Result = {
-    accessToken: string
-    name: string
-  }
-}
+import { AuthenticationUseCase } from "../../src/domain/useCases"
 
 namespace LoadAccountByEmailRepository {
   export type Result = {
@@ -15,10 +6,6 @@ namespace LoadAccountByEmailRepository {
     name: string
     password: string
   }
-}
-
-interface AuthenticationUseCase {
-  execute(input: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result>
 }
 
 interface LoadAccountByEmailRepository {
