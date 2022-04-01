@@ -1,9 +1,7 @@
 import { AddAccountRepository, CheckAccountByEmailRepository } from "../../src/data/contracts"
+import { Hasher } from "../../src/data/providers"
 import { AddAccountUseCase } from "../../src/domain/useCases"
 
-interface Hasher {
-  hash(plainText: string): Promise<string>
-}
 
 class AddAccountRepositorySpy implements AddAccountRepository {
   input?: AddAccountUseCase.Props
