@@ -1,17 +1,6 @@
-import { AddAccountRepository, CheckAccountByEmailRepository } from "../../src/data/contracts"
-import { Hasher } from "../../src/data/providers"
+import { CheckAccountByEmailRepository } from "../../src/data/contracts"
 import { AddAccountService } from "../../src/data/services"
-import { AddAccountRepositorySpy } from "./mocks"
-
-class HasherSpy implements Hasher {
-  input?: string
-  output: string = 'hashed_password'
-
-  async hash(plainText: string): Promise<string> {
-    this.input = plainText
-    return this.output
-  }
-}
+import { AddAccountRepositorySpy, HasherSpy } from "./mocks"
 
 class CheckAccountByEmailRepositorySpy implements CheckAccountByEmailRepository {
   input?: string
