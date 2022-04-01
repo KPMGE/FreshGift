@@ -33,6 +33,10 @@ interface Encrypter {
   encrypt(plainText: string): Promise<string>
 }
 
+interface UpdateTokenRepository {
+  update(id: string, token: string): Promise<void>
+}
+
 class LoadAccountByEmailRepositorySpy implements LoadAccountByEmailRepository {
   input?: string
   output = {
@@ -66,11 +70,21 @@ class EncrypterSpy implements Encrypter {
   }
 }
 
+class UpdateTokenRepositoryMock implements UpdateTokenRepository {
+  id?: string
+  token?: string
+  async update(id: string, token: string): Promise<void> {
+    this.id = id
+    this.token = token
+  }
+}
+
 class AuthenticationService {
   constructor(
     private readonly loadAccountByEmailRepository: LoadAccountByEmailRepository,
     private readonly hashComparer: HashComparer,
-    private readonly encrypter: Encrypter
+    private readonly encrypter: Encrypter,
+    private readonly updateTokenRepository: UpdateTokenRepository
   ) { }
   async execute({ email, password }: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result> {
     const account = await this.loadAccountByEmailRepository.load(email)
@@ -78,6 +92,7 @@ class AuthenticationService {
     const isPasswordCorrect = await this.hashComparer.compare(password, account.password)
     if (!isPasswordCorrect) return null
     const accessToken = await this.encrypter.encrypt(account.password)
+    await this.updateTokenRepository.update(account.id, accessToken)
     return {
       accessToken,
       name: account.name
@@ -90,19 +105,22 @@ type SutTypes = {
   loadAccountByEmailRepositorySpy: LoadAccountByEmailRepositorySpy
   hashComparerSpy: HashComparerSpy
   encrypterSpy: EncrypterSpy
+  updateTokenRepositoryMock: UpdateTokenRepositoryMock
 }
 
 const makeSut = (): SutTypes => {
   const loadAccountByEmailRepositorySpy = new LoadAccountByEmailRepositorySpy()
   const hashComparerSpy = new HashComparerSpy()
   const encrypterSpy = new EncrypterSpy()
-  const sut = new AuthenticationService(loadAccountByEmailRepositorySpy, hashComparerSpy, encrypterSpy)
+  const updateTokenRepositoryMock = new UpdateTokenRepositoryMock()
+  const sut = new AuthenticationService(loadAccountByEmailRepositorySpy, hashComparerSpy, encrypterSpy, updateTokenRepositoryMock)
 
   return {
     sut,
     loadAccountByEmailRepositorySpy,
     hashComparerSpy,
-    encrypterSpy
+    encrypterSpy,
+    updateTokenRepositoryMock
   }
 }
 
@@ -164,6 +182,13 @@ describe('authentication', () => {
     encrypterSpy.encrypt = () => { throw new Error() }
     const promise = sut.execute(fakeInput)
     await expect(promise).rejects.toThrow()
+  })
+
+  it('should call updateTokenRepository with right data', async () => {
+    const { sut, loadAccountByEmailRepositorySpy, updateTokenRepositoryMock, encrypterSpy } = makeSut()
+    await sut.execute(fakeInput)
+    expect(updateTokenRepositoryMock.id).toBe(loadAccountByEmailRepositorySpy.output.id)
+    expect(updateTokenRepositoryMock.token).toBe(encrypterSpy.output)
   })
 
   it('should return accessToken and name on success', async () => {
