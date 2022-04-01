@@ -1,19 +1,7 @@
 import { UpdateTokenRepository } from "../../src/data/contracts"
 import { Encrypter } from "../../src/data/providers"
-import { HashComparer } from "../../src/data/providers/hash-comparer"
 import { AuthenticationService } from "../../src/data/services"
-import { LoadAccountByEmailRepositorySpy } from "./mocks/load-account-by-email"
-
-class HashComparerSpy implements HashComparer {
-  plainText?: string
-  hashedInfo?: string
-  output: boolean = true
-  async compare(plainText: string, hashedInfo: string): Promise<boolean> {
-    this.plainText = plainText
-    this.hashedInfo = hashedInfo
-    return this.output
-  }
-}
+import { LoadAccountByEmailRepositorySpy, HashComparerSpy } from "./mocks"
 
 class EncrypterSpy implements Encrypter {
   plainText?: string
