@@ -1,5 +1,6 @@
 import { AddAccountRepository, CheckAccountByEmailRepository } from "../../src/data/contracts"
 import { Hasher } from "../../src/data/providers"
+import { AddAccountService } from "../../src/data/services"
 import { AddAccountUseCase } from "../../src/domain/useCases"
 
 
@@ -29,21 +30,6 @@ class CheckAccountByEmailRepositorySpy implements CheckAccountByEmailRepository 
   async check(email: string): Promise<boolean> {
     this.input = email
     return this.output
-  }
-}
-
-class AddAccountService implements AddAccountUseCase {
-  constructor(
-    private readonly addAccountRepository: AddAccountRepository,
-    private readonly hasher: Hasher,
-    private readonly checkAccountByEmailRepository: CheckAccountByEmailRepository
-  ) { }
-  async execute(account: AddAccountUseCase.Props): Promise<boolean> {
-    const accountAlreadyExists = await this.checkAccountByEmailRepository.check(account.email)
-    if (accountAlreadyExists) return false
-    const hashedPassword = await this.hasher.hash(account.password)
-    const wasAccountAdded = await this.addAccountRepository.add({ ...account, password: hashedPassword })
-    return wasAccountAdded
   }
 }
 
