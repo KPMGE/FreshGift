@@ -1,18 +1,5 @@
-namespace AddAccountUseCase {
-  export type Props = {
-    name: string,
-    email: string,
-    password: string
-  }
-}
-
-interface AddAccountUseCase {
-  execute(account: AddAccountUseCase.Props): Promise<boolean>
-}
-
-interface AddAccountRepository {
-  add(account: AddAccountUseCase.Props): Promise<boolean>
-}
+import { AddAccountRepository } from "../../src/data/contracts"
+import { AddAccountUseCase } from "../../src/domain/useCases"
 
 interface Hasher {
   hash(plainText: string): Promise<string>
