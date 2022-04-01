@@ -27,6 +27,21 @@ class AuthenticationService {
   }
 }
 
+type SutTypes = {
+  sut: AuthenticationService,
+  repositoryMock: LoadAccountByEmailRepositoryMock
+}
+
+const makeSut = (): SutTypes => {
+  const repositoryMock = new LoadAccountByEmailRepositoryMock()
+  const sut = new AuthenticationService(repositoryMock)
+
+  return {
+    sut,
+    repositoryMock
+  }
+}
+
 describe('authentication', () => {
   const fakeInput = {
     email: 'any_email@gmail.com',
@@ -34,11 +49,8 @@ describe('authentication', () => {
   }
 
   it('should call LoadAccountByEmailRepository with right data', async () => {
-    const repositoryMock = new LoadAccountByEmailRepositoryMock()
-    const sut = new AuthenticationService(repositoryMock)
-
+    const { sut, repositoryMock } = makeSut()
     await sut.execute(fakeInput)
-
     expect(repositoryMock.input).toBe(fakeInput.email)
   })
 })
