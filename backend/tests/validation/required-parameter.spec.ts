@@ -8,14 +8,24 @@ class RequiredParameterValidation implements Validator {
   }
 }
 
+const fakeParameter = 'any_required_parameter'
+
+type SutTypes = {
+  sut: RequiredParameterValidation,
+}
+
+const makeSut = (): SutTypes => {
+  const sut = new RequiredParameterValidation(fakeParameter)
+  return { sut }
+}
+
 describe('required-parameter-validation', () => {
-  const fakeParameter = 'any_required_parameter'
   const fakeInput = {
     [fakeParameter]: 'any_parameter_value'
   }
 
   it('should return MissingParameterError if an invalid field is provided', () => {
-    const sut = new RequiredParameterValidation(fakeParameter)
+    const { sut } = makeSut()
     const error = sut.validate({ invalidParam: 'any_value' })
     expect(error).toEqual(new MissingParamError(fakeParameter))
   })
