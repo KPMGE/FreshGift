@@ -1,18 +1,24 @@
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
+import { unauthorized } from "../../../src/presentation/helpers"
 
 class AuthenticatorSpy implements AuthenticationUseCase {
   input
+  output = {
+    name: 'any_name',
+    accessToken: 'any_access_token'
+  }
   async execute(input: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result> {
     this.input = input
-    return null
+    return this.output
   }
 }
 
 class SignUpController implements Controller {
   constructor(private readonly authenticator: AuthenticationUseCase) { }
   async handle(request: any): Promise<HttpResponse> {
-    await this.authenticator.execute(request)
+    const isAuthorized = await this.authenticator.execute(request)
+    if (!isAuthorized) return unauthorized()
     return null
   }
 }
@@ -46,7 +52,8 @@ describe('sign-up-controller', () => {
 
   it('should return unauthorized if wrong credentials are provided', async () => {
     const { sut, authenticatorSpy } = makeSut()
-    await sut.handle(fakeRequest)
-    expect(authenticatorSpy.input).toEqual(fakeRequest)
+    authenticatorSpy.output = null
+    const httpRespose = await sut.handle(fakeRequest)
+    expect(httpRespose).toEqual(unauthorized())
   })
 })
