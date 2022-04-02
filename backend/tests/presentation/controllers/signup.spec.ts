@@ -1,6 +1,6 @@
 import { AddAccountRepository } from "../../../src/data/contracts"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
-import { serverError } from "../../../src/presentation/helpers"
+import { forbidden, serverError } from "../../../src/presentation/helpers"
 
 namespace SignUpController {
   export type Props = {
@@ -11,11 +11,12 @@ namespace SignUpController {
   }
 }
 
-class AddAccountRepositoryMock implements AddAccountRepository {
+class AddAccountRepositorySpy implements AddAccountRepository {
   input
+  output = true
   async add(account: AddAccountRepository.Props): Promise<boolean> {
     this.input = account
-    return null
+    return this.output
   }
 }
 
@@ -23,11 +24,12 @@ class SignUpController implements Controller {
   constructor(private readonly addAccountRepository: AddAccountRepository) { }
   async handle({ name, email, password, confirmPassword }: SignUpController.Props): Promise<HttpResponse> {
     try {
-      await this.addAccountRepository.add({
+      const wasAccountAdded = await this.addAccountRepository.add({
         name,
         email,
         password
       })
+      if (!wasAccountAdded) return forbidden(new Error())
     } catch (error) {
       return serverError(error)
     }
@@ -36,15 +38,15 @@ class SignUpController implements Controller {
 
 type SutTypes = {
   sut: SignUpController,
-  addAccountRepositoryMock: AddAccountRepositoryMock
+  addAccountRepositorySpy: AddAccountRepositorySpy
 }
 
 const makeSut = (): SutTypes => {
-  const addAccountRepositoryMock = new AddAccountRepositoryMock()
-  const sut = new SignUpController(addAccountRepositoryMock)
+  const addAccountRepositorySpy = new AddAccountRepositorySpy()
+  const sut = new SignUpController(addAccountRepositorySpy)
   return {
     sut,
-    addAccountRepositoryMock
+    addAccountRepositorySpy
   }
 }
 
@@ -57,19 +59,26 @@ describe('sign-up', () => {
   }
 
   it('should return serverError if addAccountRepository throws', async () => {
-    const { sut, addAccountRepositoryMock } = makeSut()
-    addAccountRepositoryMock.add = () => { throw new Error() }
+    const { sut, addAccountRepositorySpy } = makeSut()
+    addAccountRepositorySpy.add = () => { throw new Error() }
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse).toEqual(serverError(new Error()))
   })
 
   it('should call AddAccountRepository with right data', async () => {
-    const { sut, addAccountRepositoryMock } = makeSut()
+    const { sut, addAccountRepositorySpy } = makeSut()
     await sut.handle(fakeRequest)
-    expect(addAccountRepositoryMock.input).toEqual({
+    expect(addAccountRepositorySpy.input).toEqual({
       name: fakeRequest.name,
       password: fakeRequest.password,
       email: fakeRequest.email
     })
+  })
+
+  it('should return forbidden if addAccountRepository false', async () => {
+    const { sut, addAccountRepositorySpy } = makeSut()
+    addAccountRepositorySpy.output = false
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse).toEqual(forbidden(new Error()))
   })
 })
