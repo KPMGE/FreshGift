@@ -1,5 +1,6 @@
 import { AddAccountRepository } from "../../../src/data/contracts"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
+import { serverError } from "../../../src/presentation/helpers"
 
 namespace SignUpController {
   export type Props = {
@@ -21,12 +22,15 @@ class AddAccountRepositoryMock implements AddAccountRepository {
 class SignUpController implements Controller {
   constructor(private readonly addAccountRepository: AddAccountRepository) { }
   async handle({ name, email, password, confirmPassword }: SignUpController.Props): Promise<HttpResponse> {
-    await this.addAccountRepository.add({
-      name,
-      email,
-      password
-    })
-    return null
+    try {
+      await this.addAccountRepository.add({
+        name,
+        email,
+        password
+      })
+    } catch (error) {
+      return serverError(error)
+    }
   }
 }
 
@@ -51,6 +55,13 @@ describe('sign-up', () => {
     password: 'any_password',
     confirmPassword: 'any_password'
   }
+
+  it('should return serverError if addAccountRepository throws', async () => {
+    const { sut, addAccountRepositoryMock } = makeSut()
+    addAccountRepositoryMock.add = () => { throw new Error() }
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse).toEqual(serverError(new Error()))
+  })
 
   it('should call AddAccountRepository with right data', async () => {
     const { sut, addAccountRepositoryMock } = makeSut()
