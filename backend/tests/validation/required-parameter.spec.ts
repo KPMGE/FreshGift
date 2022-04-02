@@ -1,15 +1,7 @@
-import { Validator } from "../../src/presentation/contracts"
 import { MissingParamError } from "../../src/presentation/errors"
-
-class RequiredParameterValidation implements Validator {
-  constructor(private readonly parameterName: string) { }
-  validate(input: any): Error {
-    if (!input[this.parameterName]) return new MissingParamError(this.parameterName)
-  }
-}
+import { RequiredParameterValidation } from "../../src/validation/validators"
 
 const fakeParameter = 'any_required_parameter'
-
 type SutTypes = {
   sut: RequiredParameterValidation,
 }
