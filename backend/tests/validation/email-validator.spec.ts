@@ -1,7 +1,6 @@
-import { InvalidEmailError } from "../../src/domain/errors"
-import { Validator } from "../../src/presentation/contracts"
 import { InvalidParamError } from "../../src/presentation/errors"
 import { EmailValidator } from "../../src/validation/contracts"
+import { EmailValidation } from "../../src/validation/validators/email-validation"
 
 class EmailValidatorSpy implements EmailValidator {
   input?: string
@@ -9,18 +8,6 @@ class EmailValidatorSpy implements EmailValidator {
   isValid(email: string): boolean {
     this.input = email
     return this.output
-  }
-}
-
-class EmailValidation implements Validator {
-  constructor(
-    private readonly fieldName: string,
-    private readonly emailValidator: EmailValidator
-  ) { }
-
-  validate(input: any): Error {
-    const isEmailValid = this.emailValidator.isValid(input[this.fieldName])
-    if (!isEmailValid) return new InvalidParamError(fieldName)
   }
 }
 
