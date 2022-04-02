@@ -1,22 +1,13 @@
 import { InvalidParamError } from "../../src/presentation/errors"
-import { EmailValidator } from "../../src/validation/contracts"
 import { EmailValidation } from "../../src/validation/validators/email-validation"
+import { EmailValidatorSpy } from "./mocks"
 
-class EmailValidatorSpy implements EmailValidator {
-  input?: string
-  output: boolean = true
-  isValid(email: string): boolean {
-    this.input = email
-    return this.output
-  }
-}
+const fieldName = 'email'
 
 type SutTypes = {
   sut: EmailValidation,
   emailValidatorSpy: EmailValidatorSpy
 }
-
-const fieldName = 'email'
 
 const makeSut = (): SutTypes => {
   const emailValidatorSpy = new EmailValidatorSpy()
