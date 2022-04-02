@@ -1,19 +1,7 @@
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { badRequest, ok, serverError, unauthorized } from "../../../src/presentation/helpers"
-import { ValidatorSpy } from "./mocks"
-
-class AuthenticatorSpy implements AuthenticationUseCase {
-  input
-  output = {
-    name: 'any_name',
-    accessToken: 'any_access_token'
-  }
-  async execute(input: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result> {
-    this.input = input
-    return this.output
-  }
-}
+import { AuthenticatorSpy, ValidatorSpy } from "./mocks"
 
 class LoginCtontroller implements Controller {
   constructor(
