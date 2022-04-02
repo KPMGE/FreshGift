@@ -1,7 +1,9 @@
 import { AddAccountRepository } from "../../../src/data/contracts"
+import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
 import { EmailInUseError } from "../../../src/presentation/errors"
 import { forbidden, serverError } from "../../../src/presentation/helpers"
+import { AuthenticatorSpy } from "./mocks"
 
 namespace SignUpController {
   export type Props = {
@@ -22,7 +24,10 @@ class AddAccountRepositorySpy implements AddAccountRepository {
 }
 
 class SignUpController implements Controller {
-  constructor(private readonly addAccountRepository: AddAccountRepository) { }
+  constructor(
+    private readonly addAccountRepository: AddAccountRepository,
+    private readonly authenticator: AuthenticationUseCase
+  ) { }
   async handle({ name, email, password, confirmPassword }: SignUpController.Props): Promise<HttpResponse> {
     try {
       const wasAccountAdded = await this.addAccountRepository.add({
@@ -31,6 +36,7 @@ class SignUpController implements Controller {
         password
       })
       if (!wasAccountAdded) return forbidden(new EmailInUseError())
+      await this.authenticator.execute({ email, password })
     } catch (error) {
       return serverError(error)
     }
@@ -40,14 +46,17 @@ class SignUpController implements Controller {
 type SutTypes = {
   sut: SignUpController,
   addAccountRepositorySpy: AddAccountRepositorySpy
+  authenticatorSpy: AuthenticatorSpy
 }
 
 const makeSut = (): SutTypes => {
   const addAccountRepositorySpy = new AddAccountRepositorySpy()
-  const sut = new SignUpController(addAccountRepositorySpy)
+  const authenticatorSpy = new AuthenticatorSpy()
+  const sut = new SignUpController(addAccountRepositorySpy, authenticatorSpy)
   return {
     sut,
-    addAccountRepositorySpy
+    addAccountRepositorySpy,
+    authenticatorSpy
   }
 }
 
@@ -88,5 +97,14 @@ describe('sign-up', () => {
     addAccountRepositorySpy.output = false
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse).toEqual(forbidden(new EmailInUseError()))
+  })
+
+  it('should call authenticator with right data', async () => {
+    const { sut, authenticatorSpy } = makeSut()
+    await sut.handle(fakeRequest)
+    expect(authenticatorSpy.input).toEqual({
+      email: fakeRequest.email,
+      password: fakeRequest.password
+    })
   })
 })
