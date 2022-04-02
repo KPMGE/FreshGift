@@ -57,4 +57,10 @@ describe('email-validation', () => {
     const error = sut.validate(fakeInput)
     expect(error).toEqual(new InvalidParamError(fieldName))
   })
+
+  it('should throw when EmailValidator throws', () => {
+    const { sut, emailValidatorSpy } = makeSut()
+    emailValidatorSpy.isValid = () => { throw new Error() }
+    expect(sut.validate).toThrow()
+  })
 })
