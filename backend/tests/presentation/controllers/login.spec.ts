@@ -1,15 +1,7 @@
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { badRequest, ok, serverError, unauthorized } from "../../../src/presentation/helpers"
-
-class ValidatorSpy implements Validator {
-  input
-  output
-  validate(input: any): Error {
-    this.input = input
-    return this.output
-  }
-}
+import { ValidatorSpy } from "./mocks"
 
 class AuthenticatorSpy implements AuthenticationUseCase {
   input
