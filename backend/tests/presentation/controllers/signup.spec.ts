@@ -1,5 +1,6 @@
 import { AddAccountRepository } from "../../../src/data/contracts"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
+import { EmailInUseError } from "../../../src/presentation/errors"
 import { forbidden, serverError } from "../../../src/presentation/helpers"
 
 namespace SignUpController {
@@ -29,7 +30,7 @@ class SignUpController implements Controller {
         email,
         password
       })
-      if (!wasAccountAdded) return forbidden(new Error())
+      if (!wasAccountAdded) return forbidden(new EmailInUseError())
     } catch (error) {
       return serverError(error)
     }
@@ -79,6 +80,6 @@ describe('sign-up', () => {
     const { sut, addAccountRepositorySpy } = makeSut()
     addAccountRepositorySpy.output = false
     const httpResponse = await sut.handle(fakeRequest)
-    expect(httpResponse).toEqual(forbidden(new Error()))
+    expect(httpResponse).toEqual(forbidden(new EmailInUseError()))
   })
 })
