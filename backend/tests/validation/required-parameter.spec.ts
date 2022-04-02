@@ -20,7 +20,7 @@ const makeSut = (): SutTypes => {
 }
 
 describe('required-parameter-validation', () => {
-  const fakeInput = {
+  const fakeValidInput = {
     [fakeParameter]: 'any_parameter_value'
   }
 
@@ -28,5 +28,11 @@ describe('required-parameter-validation', () => {
     const { sut } = makeSut()
     const error = sut.validate({ invalidParam: 'any_value' })
     expect(error).toEqual(new MissingParamError(fakeParameter))
+  })
+
+  it('should return nothing if the field is valid', () => {
+    const { sut } = makeSut()
+    const error = sut.validate(fakeValidInput)
+    expect(error).toBeFalsy()
   })
 })
