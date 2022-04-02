@@ -1,6 +1,6 @@
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
-import { unauthorized } from "../../../src/presentation/helpers"
+import { serverError, unauthorized } from "../../../src/presentation/helpers"
 
 class AuthenticatorSpy implements AuthenticationUseCase {
   input
@@ -17,9 +17,12 @@ class AuthenticatorSpy implements AuthenticationUseCase {
 class SignUpController implements Controller {
   constructor(private readonly authenticator: AuthenticationUseCase) { }
   async handle(request: any): Promise<HttpResponse> {
-    const isAuthorized = await this.authenticator.execute(request)
-    if (!isAuthorized) return unauthorized()
-    return null
+    try {
+      const isAuthorized = await this.authenticator.execute(request)
+      if (!isAuthorized) return unauthorized()
+    } catch (error) {
+      return serverError(error)
+    }
   }
 }
 
@@ -55,5 +58,12 @@ describe('sign-up-controller', () => {
     authenticatorSpy.output = null
     const httpRespose = await sut.handle(fakeRequest)
     expect(httpRespose).toEqual(unauthorized())
+  })
+
+  it('should return serverError if authenticator throws', async () => {
+    const { sut, authenticatorSpy } = makeSut()
+    authenticatorSpy.execute = () => { throw new Error() }
+    const httpRespose = await sut.handle(fakeRequest)
+    expect(httpRespose).toEqual(serverError(new Error()))
   })
 })
