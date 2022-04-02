@@ -1,7 +1,7 @@
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
 
-class AuthenticatorMock implements AuthenticationUseCase {
+class AuthenticatorSpy implements AuthenticationUseCase {
   input
   async execute(input: AuthenticationUseCase.Props): Promise<AuthenticationUseCase.Result> {
     this.input = input
@@ -17,6 +17,21 @@ class SignUpController implements Controller {
   }
 }
 
+type SutTypes = {
+  sut: SignUpController,
+  authenticatorSpy: AuthenticatorSpy
+}
+
+const makeSut = (): SutTypes => {
+  const authenticatorSpy = new AuthenticatorSpy()
+  const sut = new SignUpController(authenticatorSpy)
+
+  return {
+    sut,
+    authenticatorSpy
+  }
+}
+
 describe('sign-up-controller', () => {
   const fakeRequest = {
     email: 'any_valid_email@gmail.com',
@@ -24,9 +39,14 @@ describe('sign-up-controller', () => {
   }
 
   it('should call authenticator with correct data', async () => {
-    const authenticatorMock = new AuthenticatorMock()
-    const sut = new SignUpController(authenticatorMock)
+    const { sut, authenticatorSpy } = makeSut()
     await sut.handle(fakeRequest)
-    expect(authenticatorMock.input).toEqual(fakeRequest)
+    expect(authenticatorSpy.input).toEqual(fakeRequest)
+  })
+
+  it('should return unauthorized if wrong credentials are provided', async () => {
+    const { sut, authenticatorSpy } = makeSut()
+    await sut.handle(fakeRequest)
+    expect(authenticatorSpy.input).toEqual(fakeRequest)
   })
 })
