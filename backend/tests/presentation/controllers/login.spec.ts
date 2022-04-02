@@ -1,6 +1,14 @@
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
-import { Controller, HttpResponse } from "../../../src/presentation/contracts"
+import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { ok, serverError, unauthorized } from "../../../src/presentation/helpers"
+
+class ValidatorMock implements Validator {
+  input
+  validate(input: any): Error {
+    this.input = input
+    return null
+  }
+}
 
 class AuthenticatorSpy implements AuthenticationUseCase {
   input
@@ -14,12 +22,16 @@ class AuthenticatorSpy implements AuthenticationUseCase {
   }
 }
 
-class SignUpController implements Controller {
-  constructor(private readonly authenticator: AuthenticationUseCase) { }
+class LoginCtontroller implements Controller {
+  constructor(
+    private readonly authenticator: AuthenticationUseCase,
+    private readonly validator: Validator
+  ) { }
   async handle(request: any): Promise<HttpResponse> {
     try {
       const auth = await this.authenticator.execute(request)
       if (!auth) return unauthorized()
+      this.validator.validate(request)
       return ok(auth)
     } catch (error) {
       return serverError(error)
@@ -28,17 +40,20 @@ class SignUpController implements Controller {
 }
 
 type SutTypes = {
-  sut: SignUpController,
-  authenticatorSpy: AuthenticatorSpy
+  sut: LoginCtontroller,
+  authenticatorSpy: AuthenticatorSpy,
+  validatorMock: ValidatorMock
 }
 
 const makeSut = (): SutTypes => {
   const authenticatorSpy = new AuthenticatorSpy()
-  const sut = new SignUpController(authenticatorSpy)
+  const validatorMock = new ValidatorMock()
+  const sut = new LoginCtontroller(authenticatorSpy, validatorMock)
 
   return {
     sut,
-    authenticatorSpy
+    authenticatorSpy,
+    validatorMock
   }
 }
 
@@ -72,5 +87,11 @@ describe('sign-up-controller', () => {
     const { sut, authenticatorSpy } = makeSut()
     const httpRespose = await sut.handle(fakeRequest)
     expect(httpRespose).toEqual(ok(authenticatorSpy.output))
+  })
+
+  it('should call validator with right data', async () => {
+    const { sut, validatorMock } = makeSut()
+    await sut.handle(fakeRequest)
+    expect(validatorMock.input).toEqual(fakeRequest)
   })
 })
