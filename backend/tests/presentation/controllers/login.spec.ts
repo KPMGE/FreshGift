@@ -1,12 +1,13 @@
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
-import { ok, serverError, unauthorized } from "../../../src/presentation/helpers"
+import { badRequest, ok, serverError, unauthorized } from "../../../src/presentation/helpers"
 
-class ValidatorMock implements Validator {
+class ValidatorSpy implements Validator {
   input
+  output
   validate(input: any): Error {
     this.input = input
-    return null
+    return this.output
   }
 }
 
@@ -31,7 +32,8 @@ class LoginCtontroller implements Controller {
     try {
       const auth = await this.authenticator.execute(request)
       if (!auth) return unauthorized()
-      this.validator.validate(request)
+      const error = this.validator.validate(request)
+      if (error) return badRequest(error)
       return ok(auth)
     } catch (error) {
       return serverError(error)
@@ -42,18 +44,18 @@ class LoginCtontroller implements Controller {
 type SutTypes = {
   sut: LoginCtontroller,
   authenticatorSpy: AuthenticatorSpy,
-  validatorMock: ValidatorMock
+  validatorSpy: ValidatorSpy
 }
 
 const makeSut = (): SutTypes => {
   const authenticatorSpy = new AuthenticatorSpy()
-  const validatorMock = new ValidatorMock()
-  const sut = new LoginCtontroller(authenticatorSpy, validatorMock)
+  const validatorSpy = new ValidatorSpy()
+  const sut = new LoginCtontroller(authenticatorSpy, validatorSpy)
 
   return {
     sut,
     authenticatorSpy,
-    validatorMock
+    validatorSpy
   }
 }
 
@@ -90,8 +92,15 @@ describe('sign-up-controller', () => {
   })
 
   it('should call validator with right data', async () => {
-    const { sut, validatorMock } = makeSut()
+    const { sut, validatorSpy } = makeSut()
     await sut.handle(fakeRequest)
-    expect(validatorMock.input).toEqual(fakeRequest)
+    expect(validatorSpy.input).toEqual(fakeRequest)
+  })
+
+  it('should return badRequest if validator returns an error', async () => {
+    const { sut, validatorSpy } = makeSut()
+    validatorSpy.output = new Error()
+    const httpRespose = await sut.handle(fakeRequest)
+    expect(httpRespose).toEqual(badRequest(new Error()))
   })
 })
