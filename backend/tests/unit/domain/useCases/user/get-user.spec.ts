@@ -47,6 +47,9 @@ describe('get-user', () => {
     expect(user).toHaveProperty('userName')
     expect(user).toHaveProperty('email')
     expect(user).toHaveProperty('savedGifts')
+    expect(user).toHaveProperty('id')
+    expect(user).not.toHaveProperty('password')
+    expect(user).not.toHaveProperty('confirmPassword')
   })
 
   it('should throw an error if no userId is provided', async () => {
