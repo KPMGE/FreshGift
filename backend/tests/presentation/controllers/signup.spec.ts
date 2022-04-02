@@ -30,6 +30,20 @@ class SignUpController implements Controller {
   }
 }
 
+type SutTypes = {
+  sut: SignUpController,
+  addAccountRepositoryMock: AddAccountRepositoryMock
+}
+
+const makeSut = (): SutTypes => {
+  const addAccountRepositoryMock = new AddAccountRepositoryMock()
+  const sut = new SignUpController(addAccountRepositoryMock)
+  return {
+    sut,
+    addAccountRepositoryMock
+  }
+}
+
 describe('sign-up', () => {
   const fakeRequest = {
     name: 'any_name',
@@ -39,8 +53,7 @@ describe('sign-up', () => {
   }
 
   it('should call AddAccountRepository with right data', async () => {
-    const addAccountRepositoryMock = new AddAccountRepositoryMock()
-    const sut = new SignUpController(addAccountRepositoryMock)
+    const { sut, addAccountRepositoryMock } = makeSut()
     await sut.handle(fakeRequest)
     expect(addAccountRepositoryMock.input).toEqual({
       name: fakeRequest.name,
