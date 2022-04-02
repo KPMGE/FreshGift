@@ -1,7 +1,7 @@
 import { AddAccountUseCase } from "../../../domain/useCases"
 
 export interface AddAccountRepository {
-  add(account: AddAccountUseCase.Props): Promise<boolean>
+  add(account: AddAccountRepository.Props): Promise<boolean>
 }
 
 export namespace AddAccountRepository {

@@ -1,25 +1,6 @@
-import { AuthenticationUseCase } from "../../../src/domain/useCases"
-import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
+import { LoginCtontroller } from "../../../src/presentation/controllers"
 import { badRequest, ok, serverError, unauthorized } from "../../../src/presentation/helpers"
 import { AuthenticatorSpy, ValidatorSpy } from "./mocks"
-
-class LoginCtontroller implements Controller {
-  constructor(
-    private readonly authenticator: AuthenticationUseCase,
-    private readonly validator: Validator
-  ) { }
-  async handle(request: any): Promise<HttpResponse> {
-    try {
-      const auth = await this.authenticator.execute(request)
-      if (!auth) return unauthorized()
-      const error = this.validator.validate(request)
-      if (error) return badRequest(error)
-      return ok(auth)
-    } catch (error) {
-      return serverError(error)
-    }
-  }
-}
 
 type SutTypes = {
   sut: LoginCtontroller,
@@ -39,7 +20,7 @@ const makeSut = (): SutTypes => {
   }
 }
 
-describe('sign-up-controller', () => {
+describe('login-controller', () => {
   const fakeRequest = {
     email: 'any_valid_email@gmail.com',
     password: 'any_password'

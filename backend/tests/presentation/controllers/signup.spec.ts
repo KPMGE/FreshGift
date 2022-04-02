@@ -76,7 +76,14 @@ describe('sign-up', () => {
     })
   })
 
-  it('should return forbidden if addAccountRepository false', async () => {
+  it('should return forbidden if addAccountRepository returns false', async () => {
+    const { sut, addAccountRepositorySpy } = makeSut()
+    addAccountRepositorySpy.output = false
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse).toEqual(forbidden(new EmailInUseError()))
+  })
+
+  it('should return forbidden if addAccountRepository returns false', async () => {
     const { sut, addAccountRepositorySpy } = makeSut()
     addAccountRepositorySpy.output = false
     const httpResponse = await sut.handle(fakeRequest)

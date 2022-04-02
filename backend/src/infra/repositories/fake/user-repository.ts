@@ -1,4 +1,4 @@
-import { DeleteUserRepository, GetUserRepository, RegisterUserRepository } from "../../../data/contracts/user";
+import { DeleteUserRepository, GetUserRepository } from "../../../data/contracts/user";
 import { ListUsersRepository } from "../../../data/contracts/user/list-users-repository";
 import { UserDTO } from "../../../data/DTO";
 import { User } from "../../../domain/entities";
@@ -14,12 +14,6 @@ export class FakeListUsersRepository implements ListUsersRepository {
     })
 
     return result
-  }
-}
-
-export class FakeRegisterUserRepository implements RegisterUserRepository {
-  async register(user: User): Promise<void> {
-    listUsers.push(user)
   }
 }
 
