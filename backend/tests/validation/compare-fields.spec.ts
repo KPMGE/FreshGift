@@ -1,13 +1,5 @@
-import { Validator } from "../../src/presentation/contracts"
 import { InvalidParamError } from "../../src/presentation/errors"
-
-class CompareFieldsValidation implements Validator {
-  constructor(private readonly field: string, private readonly fieldToCompare: string) { }
-  validate(input: any): Error {
-    const areFieldsEqual = input[this.field] === input[this.fieldToCompare]
-    if (!areFieldsEqual) return new InvalidParamError(this.field)
-  }
-}
+import { CompareFieldsValidation } from "../../src/validation/validators"
 
 describe('compare-fields-validation', () => {
   const fieldName = 'any_name'
