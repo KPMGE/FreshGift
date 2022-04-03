@@ -1,17 +1,7 @@
-import { AddAccountRepository } from "../../../src/data/contracts"
 import { SignUpController } from "../../../src/presentation/controllers/account/signup"
 import { EmailInUseError, MissingParamError } from "../../../src/presentation/errors"
-import { badRequest, forbidden, ok, serverError } from "../../../src/presentation/helpers"
-import { AuthenticatorSpy, ValidatorSpy } from "./mocks"
-
-class AddAccountRepositorySpy implements AddAccountRepository {
-  input
-  output = true
-  async add(account: AddAccountRepository.Props): Promise<boolean> {
-    this.input = account
-    return this.output
-  }
-}
+import { badRequest, forbidden, serverError } from "../../../src/presentation/helpers"
+import { AddAccountRepositorySpy, AuthenticatorSpy, ValidatorSpy } from "./mocks"
 
 type SutTypes = {
   sut: SignUpController,
