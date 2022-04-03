@@ -1,9 +1,9 @@
 import { AddAccountRepository } from "../../../src/data/contracts"
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
-import { Controller, HttpResponse } from "../../../src/presentation/contracts"
+import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { EmailInUseError } from "../../../src/presentation/errors"
 import { forbidden, serverError } from "../../../src/presentation/helpers"
-import { AuthenticatorSpy } from "./mocks"
+import { AuthenticatorSpy, ValidatorSpy } from "./mocks"
 
 namespace SignUpController {
   export type Props = {
@@ -26,17 +26,15 @@ class AddAccountRepositorySpy implements AddAccountRepository {
 class SignUpController implements Controller {
   constructor(
     private readonly addAccountRepository: AddAccountRepository,
-    private readonly authenticator: AuthenticationUseCase
+    private readonly authenticator: AuthenticationUseCase,
+    private readonly validator: Validator
   ) { }
   async handle({ name, email, password, confirmPassword }: SignUpController.Props): Promise<HttpResponse> {
     try {
-      const wasAccountAdded = await this.addAccountRepository.add({
-        name,
-        email,
-        password
-      })
+      const wasAccountAdded = await this.addAccountRepository.add({ name, email, password })
       if (!wasAccountAdded) return forbidden(new EmailInUseError())
       await this.authenticator.execute({ email, password })
+      this.validator.validate({ name, email, password, confirmPassword })
     } catch (error) {
       return serverError(error)
     }
@@ -46,17 +44,20 @@ class SignUpController implements Controller {
 type SutTypes = {
   sut: SignUpController,
   addAccountRepositorySpy: AddAccountRepositorySpy
-  authenticatorSpy: AuthenticatorSpy
+  authenticatorSpy: AuthenticatorSpy,
+  validatorSpy: ValidatorSpy
 }
 
 const makeSut = (): SutTypes => {
   const addAccountRepositorySpy = new AddAccountRepositorySpy()
   const authenticatorSpy = new AuthenticatorSpy()
-  const sut = new SignUpController(addAccountRepositorySpy, authenticatorSpy)
+  const validatorSpy = new ValidatorSpy()
+  const sut = new SignUpController(addAccountRepositorySpy, authenticatorSpy, validatorSpy)
   return {
     sut,
     addAccountRepositorySpy,
-    authenticatorSpy
+    authenticatorSpy,
+    validatorSpy
   }
 }
 
@@ -106,5 +107,11 @@ describe('sign-up', () => {
       email: fakeRequest.email,
       password: fakeRequest.password
     })
+  })
+
+  it('should call validator with right data', async () => {
+    const { sut, validatorSpy } = makeSut()
+    await sut.handle(fakeRequest)
+    expect(validatorSpy.input).toEqual(fakeRequest)
   })
 })
