@@ -1,8 +1,8 @@
 import { AddAccountRepository } from "../../../src/data/contracts"
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
-import { EmailInUseError } from "../../../src/presentation/errors"
-import { forbidden, serverError } from "../../../src/presentation/helpers"
+import { EmailInUseError, MissingParamError } from "../../../src/presentation/errors"
+import { badRequest, forbidden, serverError } from "../../../src/presentation/helpers"
 import { AuthenticatorSpy, ValidatorSpy } from "./mocks"
 
 namespace SignUpController {
@@ -33,8 +33,9 @@ class SignUpController implements Controller {
     try {
       const wasAccountAdded = await this.addAccountRepository.add({ name, email, password })
       if (!wasAccountAdded) return forbidden(new EmailInUseError())
+      const error = this.validator.validate({ name, email, password, confirmPassword })
+      if (error) return badRequest(error)
       await this.authenticator.execute({ email, password })
-      this.validator.validate({ name, email, password, confirmPassword })
     } catch (error) {
       return serverError(error)
     }
@@ -113,5 +114,12 @@ describe('sign-up', () => {
     const { sut, validatorSpy } = makeSut()
     await sut.handle(fakeRequest)
     expect(validatorSpy.input).toEqual(fakeRequest)
+  })
+
+  it('should return badRequest if validator returns error', async () => {
+    const { sut, validatorSpy } = makeSut()
+    validatorSpy.validate = () => { return new MissingParamError('some_param') }
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse).toEqual(badRequest(new MissingParamError('some_param')))
   })
 })
