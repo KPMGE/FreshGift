@@ -2,7 +2,7 @@ import { AddAccountRepository } from "../../../src/data/contracts"
 import { AuthenticationUseCase } from "../../../src/domain/useCases"
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { EmailInUseError, MissingParamError } from "../../../src/presentation/errors"
-import { badRequest, forbidden, serverError } from "../../../src/presentation/helpers"
+import { badRequest, forbidden, ok, serverError } from "../../../src/presentation/helpers"
 import { AuthenticatorSpy, ValidatorSpy } from "./mocks"
 
 namespace SignUpController {
@@ -35,7 +35,8 @@ class SignUpController implements Controller {
       if (!wasAccountAdded) return forbidden(new EmailInUseError())
       const error = this.validator.validate({ name, email, password, confirmPassword })
       if (error) return badRequest(error)
-      await this.authenticator.execute({ email, password })
+      const authenticatedAccount = await this.authenticator.execute({ email, password })
+      return ok(authenticatedAccount)
     } catch (error) {
       return serverError(error)
     }
@@ -121,5 +122,12 @@ describe('sign-up', () => {
     validatorSpy.validate = () => { return new MissingParamError('some_param') }
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse).toEqual(badRequest(new MissingParamError('some_param')))
+  })
+
+  it('should return authenticatedUser and status 200', async () => {
+    const { sut, authenticatorSpy } = makeSut()
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual(authenticatorSpy.output)
   })
 })
