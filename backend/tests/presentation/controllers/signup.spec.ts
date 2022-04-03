@@ -1,23 +1,33 @@
+import { AddAccountUseCase } from "../../../src/domain/useCases"
 import { SignUpController } from "../../../src/presentation/controllers/account/signup"
 import { EmailInUseError, MissingParamError } from "../../../src/presentation/errors"
 import { badRequest, forbidden, serverError } from "../../../src/presentation/helpers"
-import { AddAccountRepositorySpy, AuthenticatorSpy, ValidatorSpy } from "./mocks"
+import { AuthenticatorSpy, ValidatorSpy } from "./mocks"
 
 type SutTypes = {
   sut: SignUpController,
-  addAccountRepositorySpy: AddAccountRepositorySpy
+  addAccountServiceSpy: AddAccountServiceSpy,
   authenticatorSpy: AuthenticatorSpy,
   validatorSpy: ValidatorSpy
 }
 
+class AddAccountServiceSpy implements AddAccountUseCase {
+  input: AddAccountUseCase.Props
+  output: boolean = true
+  async execute(account: AddAccountUseCase.Props): Promise<boolean> {
+    this.input = account
+    return this.output
+  }
+}
+
 const makeSut = (): SutTypes => {
-  const addAccountRepositorySpy = new AddAccountRepositorySpy()
+  const addAccountServiceSpy = new AddAccountServiceSpy()
   const authenticatorSpy = new AuthenticatorSpy()
   const validatorSpy = new ValidatorSpy()
-  const sut = new SignUpController(addAccountRepositorySpy, authenticatorSpy, validatorSpy)
+  const sut = new SignUpController(addAccountServiceSpy, authenticatorSpy, validatorSpy)
   return {
     sut,
-    addAccountRepositorySpy,
+    addAccountServiceSpy,
     authenticatorSpy,
     validatorSpy
   }
@@ -31,33 +41,33 @@ describe('sign-up', () => {
     confirmPassword: 'any_password'
   }
 
-  it('should return serverError if addAccountRepository throws', async () => {
-    const { sut, addAccountRepositorySpy } = makeSut()
-    addAccountRepositorySpy.add = () => { throw new Error() }
+  it('should return serverError if addAccountService throws', async () => {
+    const { sut, addAccountServiceSpy } = makeSut()
+    addAccountServiceSpy.execute = () => { throw new Error() }
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse).toEqual(serverError(new Error()))
   })
 
-  it('should call AddAccountRepository with right data', async () => {
-    const { sut, addAccountRepositorySpy } = makeSut()
+  it('should call AddAccountService with right data', async () => {
+    const { sut, addAccountServiceSpy } = makeSut()
     await sut.handle(fakeRequest)
-    expect(addAccountRepositorySpy.input).toEqual({
+    expect(addAccountServiceSpy.input).toEqual({
       name: fakeRequest.name,
       password: fakeRequest.password,
       email: fakeRequest.email
     })
   })
 
-  it('should return forbidden if addAccountRepository returns false', async () => {
-    const { sut, addAccountRepositorySpy } = makeSut()
-    addAccountRepositorySpy.output = false
+  it('should return forbidden if addAccountService returns false', async () => {
+    const { sut, addAccountServiceSpy } = makeSut()
+    addAccountServiceSpy.output = false
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse).toEqual(forbidden(new EmailInUseError()))
   })
 
-  it('should return forbidden if addAccountRepository returns false', async () => {
-    const { sut, addAccountRepositorySpy } = makeSut()
-    addAccountRepositorySpy.output = false
+  it('should return forbidden if addAccountService returns false', async () => {
+    const { sut, addAccountServiceSpy } = makeSut()
+    addAccountServiceSpy.output = false
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse).toEqual(forbidden(new EmailInUseError()))
   })

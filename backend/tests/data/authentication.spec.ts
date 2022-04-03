@@ -75,7 +75,7 @@ describe('authentication', () => {
   it('should call encrypter with right data', async () => {
     const { sut, encrypterSpy, loadAccountByEmailRepositorySpy } = makeSut()
     await sut.execute(fakeInput)
-    expect(encrypterSpy.plainText).toBe(loadAccountByEmailRepositorySpy.output.password)
+    expect(encrypterSpy.plainText).toBe(loadAccountByEmailRepositorySpy.output.id)
   })
 
   it('should throw if encrypter throws', async () => {

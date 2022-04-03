@@ -1,12 +1,11 @@
-import { AddAccountService } from "../../../data/services"
-import { AuthenticationUseCase } from "../../../domain/useCases"
+import { AddAccountUseCase, AuthenticationUseCase } from "../../../domain/useCases"
 import { Controller, HttpResponse, Validator } from "../../contracts"
 import { EmailInUseError } from "../../errors"
 import { badRequest, forbidden, ok, serverError } from "../../helpers"
 
 export class SignUpController implements Controller {
   constructor(
-    private readonly addAccountService: AddAccountService,
+    private readonly addAccountService: AddAccountUseCase,
     private readonly authenticator: AuthenticationUseCase,
     private readonly validator: Validator
   ) { }

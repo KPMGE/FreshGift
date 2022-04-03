@@ -1,4 +1,4 @@
-import { Hasher } from "../../../src/data/providers"
+import { Hasher } from "../../../src/data/contracts"
 
 export class HasherSpy implements Hasher {
   input?: string
