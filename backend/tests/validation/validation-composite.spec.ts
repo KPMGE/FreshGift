@@ -20,5 +20,12 @@ describe('validation-composite', () => {
     validators[0].output = new MissingParamError('any_param')
     const error = sut.validate({})
     expect(error).toEqual(validators[0].output)
+    validators[0].output = null
+  })
+
+  it('should not return if all validations succeed', () => {
+    const sut = new ValidationComposite(validators)
+    const error = sut.validate({})
+    expect(error).toBeFalsy()
   })
 })
