@@ -1,6 +1,5 @@
 import { AddAccountUseCase } from "../../../domain/useCases"
-import { AddAccountRepository, CheckAccountByEmailRepository } from "../../contracts"
-import { Hasher } from "../../providers"
+import { AddAccountRepository, CheckAccountByEmailRepository, Hasher } from "../../contracts"
 
 export class AddAccountService implements AddAccountUseCase {
   constructor(

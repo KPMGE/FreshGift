@@ -1,4 +1,4 @@
-import { HashComparer } from "../../../src/data/providers"
+import { HashComparer } from "../../../src/data/contracts"
 
 export class HashComparerSpy implements HashComparer {
   plainText?: string

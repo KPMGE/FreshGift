@@ -1,6 +1,6 @@
 import { AuthenticationUseCase } from "../../../domain/useCases"
 import { LoadAccountByEmailRepository, UpdateTokenRepository } from "../../contracts"
-import { Encrypter, HashComparer } from "../../providers"
+import { Encrypter, HashComparer } from "../../contracts/cryptography"
 
 export class AuthenticationService {
   constructor(
