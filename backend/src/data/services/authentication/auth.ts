@@ -14,7 +14,7 @@ export class AuthenticationService {
     if (!account) return null
     const isPasswordCorrect = await this.hashComparer.compare(password, account.password)
     if (!isPasswordCorrect) return null
-    const accessToken = await this.encrypter.encrypt(account.password)
+    const accessToken = await this.encrypter.encrypt(account.id)
     await this.updateTokenRepository.update(account.id, accessToken)
     return {
       accessToken,

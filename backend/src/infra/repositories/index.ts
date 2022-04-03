@@ -1,1 +1,1 @@
-export * from './fake/gift-repository'
+export * from './fake'
