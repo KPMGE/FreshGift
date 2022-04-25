@@ -1,18 +1,8 @@
 import { Gift } from "../../../src/domain/entities";
 import { CreateGift } from "../../../src/domain/useCases";
-import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
+import { CreateGiftController } from "../../../src/presentation/controllers/gift/create-gift";
 import { ServerError } from "../../../src/presentation/errors";
-import { badRequest, created, serverError } from "../../../src/presentation/helpers";
 import { ValidatorSpy } from "./mocks";
-
-export namespace CreateGiftController {
-  export type Request = {
-    name: string;
-    price: number;
-    description: string;
-    imageUrl: string;
-  }
-}
 
 class CreateGiftServiceSpy implements CreateGift {
   input
@@ -34,21 +24,6 @@ const fakeRequest: CreateGiftController.Request = {
   price: 100.2,
   description: "any_description",
   imageUrl: "any_image_url"
-}
-
-class CreateGiftController implements Controller {
-  constructor(private readonly createGiftService: CreateGift, private readonly validator: Validator) { }
-
-  async handle(request: CreateGiftController.Request): Promise<HttpResponse> {
-    const error = this.validator.validate(request)
-    if (error) return badRequest(error)
-    try {
-      const createdGift = await this.createGiftService.execute(request)
-      return created(createdGift)
-    } catch (err) {
-      return serverError(err)
-    }
-  }
 }
 
 type SutTypes = {
