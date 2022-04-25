@@ -1,16 +1,9 @@
-import { Gift } from "../../../src/domain/entities"
 import { ListGift } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
 import { ServerError } from "../../../src/presentation/errors"
 import { ok, serverError } from "../../../src/presentation/helpers"
 import { makeFakeGift } from "../../domain/mocks/gift"
-
-class ListGiftsServiceStub implements ListGift {
-  output = [makeFakeGift(), makeFakeGift()]
-  async execute(): Promise<Gift[]> {
-    return this.output
-  }
-}
+import { ListGiftsServiceStub } from "./list-gifts"
 
 class ListGiftsController implements Controller {
   constructor(private readonly listGiftsService: ListGift) { }
