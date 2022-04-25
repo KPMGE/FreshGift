@@ -2,10 +2,6 @@ import { Gift } from "../../src/domain/entities"
 import { CreateGift } from "../../src/domain/useCases"
 import { SaveGiftRepository } from "../../src/data/contracts"
 
-interface IdGenerator {
-  generate(): string
-}
-
 class SaveGiftRepositorySpy implements SaveGiftRepository {
   input
   output: Gift = {
