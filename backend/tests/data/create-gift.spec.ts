@@ -1,21 +1,7 @@
-import { Gift } from "../../src/domain/entities"
 import { CreateGift } from "../../src/domain/useCases"
-import { SaveGiftRepository } from "../../src/data/contracts"
 import { SaveGiftRepositorySpy } from "./mocks/save-gift-repository"
 import { IdGeneratorStub } from "./mocks/id-generator"
-
-class CreateGiftService implements CreateGift {
-  constructor(
-    private readonly giftRepo: SaveGiftRepository,
-    private readonly idGenerator: IdGenerator
-  ) { }
-
-  async execute(gift: CreateGift.Props): Promise<Gift> {
-    const newGift = { ...gift, id: this.idGenerator.generate() }
-    const savedGift = await this.giftRepo.save(newGift)
-    return savedGift
-  }
-}
+import { CreateGiftService } from "../../src/data/services"
 
 type SutTypes = {
   saveGiftRepo: SaveGiftRepositorySpy
