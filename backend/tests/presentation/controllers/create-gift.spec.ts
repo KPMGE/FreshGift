@@ -1,23 +1,7 @@
-import { Gift } from "../../../src/domain/entities";
-import { CreateGift } from "../../../src/domain/useCases";
 import { CreateGiftController } from "../../../src/presentation/controllers/gift/create-gift";
 import { ServerError } from "../../../src/presentation/errors";
 import { ValidatorSpy } from "./mocks";
-
-class CreateGiftServiceSpy implements CreateGift {
-  input
-  output: Gift = {
-    id: 'any_id',
-    name: "any_name",
-    price: 100.2,
-    description: "any_description",
-    imageUrl: "any_image_url"
-  }
-  async execute(gift: CreateGift.Props): Promise<Gift> {
-    this.input = gift
-    return this.output
-  }
-}
+import { CreateGiftServiceSpy } from "./mocks/create-gift-service";
 
 const fakeRequest: CreateGiftController.Request = {
   name: "any_name",
