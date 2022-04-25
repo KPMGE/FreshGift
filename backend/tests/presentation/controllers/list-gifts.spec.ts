@@ -18,13 +18,24 @@ class ListGiftsController implements Controller {
   }
 }
 
+type SutTypes = {
+  service: ListGiftsServiceStub,
+  sut: ListGiftsController
+}
+
+const makeSut = (): SutTypes => {
+  const service = new ListGiftsServiceStub()
+  const sut = new ListGiftsController(service)
+  return {
+    service,
+    sut
+  }
+}
+
 describe('list-gifts-controller', () => {
   it('should return right data on success', async () => {
-    const service = new ListGiftsServiceStub()
-    const sut = new ListGiftsController(service)
-
+    const { sut } = makeSut()
     const httpResponse = await sut.handle({})
-
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body).toEqual([makeFakeGift(), makeFakeGift()])
   })
