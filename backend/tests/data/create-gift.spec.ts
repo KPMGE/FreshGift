@@ -66,4 +66,13 @@ describe("create-gift", () => {
 
     expect(saveGiftRepo.input).toEqual({ ...fakeInput, id: idGenerator.output })
   })
+
+  it("should throw if repository throws", async () => {
+    const { saveGiftRepo, sut } = makeSut()
+    saveGiftRepo.save = () => { throw new Error("repo error") }
+
+    const promise = sut.execute(fakeInput)
+
+    await expect(promise).rejects.toThrowError(new Error("repo error"))
+  })
 })
