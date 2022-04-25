@@ -24,17 +24,29 @@ class ListGiftsService implements ListGift {
   }
 }
 
+type SutTypes = {
+  listGiftRepo: ListGiftsRepositoryStub,
+  sut: ListGiftsService
+}
+
+const makeSut = (): SutTypes => {
+  const listGiftRepo = new ListGiftsRepositoryStub()
+  const sut = new ListGiftsService(listGiftRepo)
+  return {
+    listGiftRepo,
+    sut
+  }
+}
+
 describe('list-gifts-service', () => {
+  const { sut } = makeSut()
   it('should return right data', async () => {
-    const listGiftRepo = new ListGiftsRepositoryStub()
-    const sut = new ListGiftsService(listGiftRepo)
     const gifts = await sut.execute()
     expect(gifts).toEqual([fakeGift, fakeGift])
   })
 
   it('should throw if repository throws', async () => {
-    const listGiftRepo = new ListGiftsRepositoryStub()
-    const sut = new ListGiftsService(listGiftRepo)
+    const { sut, listGiftRepo } = makeSut()
     listGiftRepo.list = () => { throw new Error('repo error') }
     const promise = sut.execute()
     expect(promise).rejects.toThrow()
