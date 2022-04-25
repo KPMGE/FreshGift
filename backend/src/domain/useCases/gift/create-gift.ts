@@ -1,7 +1,7 @@
-import { Gift } from "../../entities";
+import { Gift } from "../../entities"
 
 export interface CreateGift {
-  execute(gift?: CreateGift.Props): Promise<Gift>;
+  execute(gift: CreateGift.Props): Promise<Gift>
 }
 
 export namespace CreateGift {
