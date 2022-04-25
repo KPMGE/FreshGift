@@ -1,7 +1,8 @@
 import { Gift } from "../../../src/domain/entities"
 import { ListGift } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
-import { ok } from "../../../src/presentation/helpers"
+import { ServerError } from "../../../src/presentation/errors"
+import { ok, serverError } from "../../../src/presentation/helpers"
 import { makeFakeGift } from "../../domain/mocks/gift"
 
 class ListGiftsServiceStub implements ListGift {
@@ -14,7 +15,12 @@ class ListGiftsServiceStub implements ListGift {
 class ListGiftsController implements Controller {
   constructor(private readonly listGiftsService: ListGift) { }
   async handle(request: any): Promise<HttpResponse> {
-    return ok(await this.listGiftsService.execute())
+    try {
+      const gifts = await this.listGiftsService.execute()
+      return ok(gifts)
+    } catch (error) {
+      return serverError(error)
+    }
   }
 }
 
@@ -38,5 +44,13 @@ describe('list-gifts-controller', () => {
     const httpResponse = await sut.handle({})
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body).toEqual([makeFakeGift(), makeFakeGift()])
+  })
+
+  it('should return serverError if service throws', async () => {
+    const { sut, service } = makeSut()
+    service.execute = () => { throw new Error('service error') }
+    const httpResponse = await sut.handle({})
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError('service error'))
   })
 })
