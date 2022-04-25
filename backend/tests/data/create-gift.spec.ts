@@ -1,28 +1,8 @@
 import { Gift } from "../../src/domain/entities"
 import { CreateGift } from "../../src/domain/useCases"
 import { SaveGiftRepository } from "../../src/data/contracts"
-
-class SaveGiftRepositorySpy implements SaveGiftRepository {
-  input
-  output: Gift = {
-    id: 'any_id',
-    name: 'any_name',
-    description: 'any_description',
-    imageUrl: 'any_image_url',
-    price: 100.1
-  }
-  async save(gift: Gift): Promise<Gift> {
-    this.input = gift
-    return this.output
-  }
-}
-
-class IdGeneratorStub implements IdGenerator {
-  output = "any_id"
-  generate(): string {
-    return this.output
-  }
-}
+import { SaveGiftRepositorySpy } from "./mocks/save-gift-repository"
+import { IdGeneratorStub } from "./mocks/id-generator"
 
 class CreateGiftService implements CreateGift {
   constructor(
