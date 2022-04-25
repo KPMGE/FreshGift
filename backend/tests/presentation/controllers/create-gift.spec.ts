@@ -35,10 +35,23 @@ class CreateGiftController implements Controller {
   }
 }
 
+type SutTypes = {
+  createGiftService: CreateGiftServiceSpy,
+  sut: CreateGiftController
+}
+
+const makeSut = (): SutTypes => {
+  const createGiftService = new CreateGiftServiceSpy()
+  const sut = new CreateGiftController(createGiftService)
+  return {
+    createGiftService,
+    sut
+  }
+}
+
 describe('create-gift-controller', () => {
   it('should call service with right data', async () => {
-    const createGiftService = new CreateGiftServiceSpy()
-    const sut = new CreateGiftController(createGiftService)
+    const { sut, createGiftService } = makeSut()
     await sut.handle(fakeRequest)
     expect(createGiftService.input).toEqual(fakeRequest)
   })
