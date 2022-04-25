@@ -1,7 +1,8 @@
 import { Gift } from "../../../src/domain/entities";
 import { CreateGift } from "../../../src/domain/useCases";
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
-import { badRequest, ok } from "../../../src/presentation/helpers";
+import { ServerError } from "../../../src/presentation/errors";
+import { badRequest, ok, serverError } from "../../../src/presentation/helpers";
 import { ValidatorSpy } from "./mocks";
 
 export namespace CreateGiftController {
@@ -41,8 +42,12 @@ class CreateGiftController implements Controller {
   async handle(request: CreateGiftController.Request): Promise<HttpResponse> {
     const error = this.validator.validate(request)
     if (error) return badRequest(error)
-    const createdGift = await this.createGiftService.execute(request)
-    return ok(createdGift)
+    try {
+      const createdGift = await this.createGiftService.execute(request)
+      return ok(createdGift)
+    } catch (err) {
+      return serverError(err)
+    }
   }
 }
 
@@ -84,5 +89,13 @@ describe('create-gift-controller', () => {
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse.statusCode).toBe(200)
     expect(httpResponse.body).toEqual(createGiftService.output)
+  })
+
+  it('should return serverError if createGiftService throws', async () => {
+    const { sut, createGiftService } = makeSut()
+    createGiftService.execute = () => { throw new Error('service error') }
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse.statusCode).toBe(500)
+    expect(httpResponse.body).toEqual(new ServerError('service error'))
   })
 })
