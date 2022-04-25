@@ -2,7 +2,7 @@ import { Gift } from "../../../src/domain/entities";
 import { CreateGift } from "../../../src/domain/useCases";
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { ServerError } from "../../../src/presentation/errors";
-import { badRequest, ok, serverError } from "../../../src/presentation/helpers";
+import { badRequest, created, serverError } from "../../../src/presentation/helpers";
 import { ValidatorSpy } from "./mocks";
 
 export namespace CreateGiftController {
@@ -44,7 +44,7 @@ class CreateGiftController implements Controller {
     if (error) return badRequest(error)
     try {
       const createdGift = await this.createGiftService.execute(request)
-      return ok(createdGift)
+      return created(createdGift)
     } catch (err) {
       return serverError(err)
     }
@@ -84,10 +84,10 @@ describe('create-gift-controller', () => {
     expect(httpResponse.body).toEqual(new Error('invalid field'))
   })
 
-  it('should return Ok on success', async () => {
+  it('should return created on success', async () => {
     const { sut, createGiftService } = makeSut()
     const httpResponse = await sut.handle(fakeRequest)
-    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.statusCode).toBe(201)
     expect(httpResponse.body).toEqual(createGiftService.output)
   })
 
