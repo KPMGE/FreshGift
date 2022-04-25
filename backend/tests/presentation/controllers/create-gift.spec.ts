@@ -1,7 +1,7 @@
 import { Gift } from "../../../src/domain/entities";
 import { CreateGift } from "../../../src/domain/useCases";
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
-import { badRequest } from "../../../src/presentation/helpers";
+import { badRequest, ok } from "../../../src/presentation/helpers";
 import { ValidatorSpy } from "./mocks";
 
 export namespace CreateGiftController {
@@ -15,9 +15,16 @@ export namespace CreateGiftController {
 
 class CreateGiftServiceSpy implements CreateGift {
   input
+  output: Gift = {
+    id: 'any_id',
+    name: "any_name",
+    price: 100.2,
+    description: "any_description",
+    imageUrl: "any_image_url"
+  }
   async execute(gift: CreateGift.Props): Promise<Gift> {
     this.input = gift
-    return null
+    return this.output
   }
 }
 
@@ -34,8 +41,8 @@ class CreateGiftController implements Controller {
   async handle(request: CreateGiftController.Request): Promise<HttpResponse> {
     const error = this.validator.validate(request)
     if (error) return badRequest(error)
-    this.createGiftService.execute(request)
-    return null
+    const createdGift = await this.createGiftService.execute(request)
+    return ok(createdGift)
   }
 }
 
@@ -70,5 +77,12 @@ describe('create-gift-controller', () => {
     const httpResponse = await sut.handle(fakeRequest)
     expect(httpResponse.statusCode).toBe(400)
     expect(httpResponse.body).toEqual(new Error('invalid field'))
+  })
+
+  it('should return Ok on success', async () => {
+    const { sut, createGiftService } = makeSut()
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual(createGiftService.output)
   })
 })
