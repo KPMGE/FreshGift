@@ -3,12 +3,10 @@ import { GetGiftByIdRepository } from '../../../data/contracts/gift/get-gift-by-
 import { GiftDTO } from '../../../data/DTO'
 import { Gift } from '../../../domain/entities'
 import { UpdateGift } from '../../../domain/useCases/gift'
-import { GiftViewModel } from '../../../presentation/view-models'
 
 let listGifts: Gift[] = []
 
 export class FakeSaveGiftRepository implements SaveGiftRepository {
-
   async save(gift: Gift): Promise<Gift> {
     listGifts.push(gift)
     return gift
@@ -27,7 +25,7 @@ export class FakeDeleteGiftRepository implements DeleteGiftRepository {
 }
 
 export class FakeListGiftRepository implements ListGiftRepository {
-  async list(): Promise<GiftViewModel[]> {
+  async list(): Promise<Gift[]> {
     return listGifts
   }
 }
