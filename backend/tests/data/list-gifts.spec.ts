@@ -1,6 +1,6 @@
 import { ListGiftRepository } from "../../src/data/contracts"
+import { ListGiftsService } from "../../src/data/services/gift/list-gifts"
 import { Gift } from "../../src/domain/entities"
-import { ListGift } from "../../src/domain/useCases"
 
 const fakeGift: Gift = {
   id: 'any_id',
@@ -14,13 +14,6 @@ class ListGiftsRepositoryStub implements ListGiftRepository {
   output = [fakeGift, fakeGift]
   async list(): Promise<Gift[]> {
     return this.output
-  }
-}
-
-class ListGiftsService implements ListGift {
-  constructor(private readonly listGiftRepo: ListGiftRepository) { }
-  async execute(): Promise<Gift[]> {
-    return await this.listGiftRepo.list()
   }
 }
 
