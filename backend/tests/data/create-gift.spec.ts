@@ -34,19 +34,33 @@ class CreateGiftService implements CreateGift {
   }
 }
 
+type SutTypes = {
+  saveGiftRepo: SaveGiftRepositorySpy
+  idGenerator: IdGeneratorStub,
+  sut: CreateGiftService
+}
+
+const makeSut = (): SutTypes => {
+  const saveGiftRepo = new SaveGiftRepositorySpy()
+  const idGenerator = new IdGeneratorStub()
+  const sut = new CreateGiftService(saveGiftRepo, idGenerator)
+  return {
+    saveGiftRepo,
+    idGenerator,
+    sut
+  }
+}
+
+const fakeInput: CreateGift.Props = {
+  name: 'any_name',
+  description: 'any_description',
+  imageUrl: 'any_image_url',
+  price: 100.1
+}
 
 describe("create-gift", () => {
   it("should call repository with right data", async () => {
-    const saveGiftRepo = new SaveGiftRepositorySpy()
-    const idGenerator = new IdGeneratorStub()
-    const sut = new CreateGiftService(saveGiftRepo, idGenerator)
-
-    const fakeInput: CreateGift.Props = {
-      name: 'any_name',
-      description: 'any_description',
-      imageUrl: 'any_image_url',
-      price: 100.1
-    }
+    const { saveGiftRepo, idGenerator, sut } = makeSut()
 
     await sut.execute(fakeInput)
 
