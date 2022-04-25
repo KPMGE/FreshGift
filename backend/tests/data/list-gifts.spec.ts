@@ -1,21 +1,6 @@
-import { ListGiftRepository } from "../../src/data/contracts"
 import { ListGiftsService } from "../../src/data/services/gift/list-gifts"
-import { Gift } from "../../src/domain/entities"
-
-const fakeGift: Gift = {
-  id: 'any_id',
-  name: 'any_name',
-  price: 100.2,
-  imageUrl: 'any_image_url',
-  description: 'any_description'
-}
-
-class ListGiftsRepositoryStub implements ListGiftRepository {
-  output = [fakeGift, fakeGift]
-  async list(): Promise<Gift[]> {
-    return this.output
-  }
-}
+import { makeFakeGift } from "../domain/mocks/gift"
+import { ListGiftsRepositoryStub } from "./mocks/list-gifts"
 
 type SutTypes = {
   listGiftRepo: ListGiftsRepositoryStub,
@@ -35,7 +20,7 @@ describe('list-gifts-service', () => {
   const { sut } = makeSut()
   it('should return right data', async () => {
     const gifts = await sut.execute()
-    expect(gifts).toEqual([fakeGift, fakeGift])
+    expect(gifts).toEqual([makeFakeGift(), makeFakeGift()])
   })
 
   it('should throw if repository throws', async () => {
