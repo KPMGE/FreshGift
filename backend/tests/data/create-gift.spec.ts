@@ -8,9 +8,16 @@ interface IdGenerator {
 
 class SaveGiftRepositorySpy implements SaveGiftRepository {
   input
+  output: Gift = {
+    id: 'any_id',
+    name: 'any_name',
+    description: 'any_description',
+    imageUrl: 'any_image_url',
+    price: 100.1
+  }
   async save(gift: Gift): Promise<Gift> {
     this.input = gift
-    return null
+    return this.output
   }
 }
 
@@ -74,5 +81,13 @@ describe("create-gift", () => {
     const promise = sut.execute(fakeInput)
 
     await expect(promise).rejects.toThrowError(new Error("repo error"))
+  })
+
+  it("should return right data on success", async () => {
+    const { sut, idGenerator } = makeSut()
+
+    const savedGift = await sut.execute(fakeInput)
+
+    expect(savedGift).toEqual({ ...fakeInput, id: idGenerator.output })
   })
 })
