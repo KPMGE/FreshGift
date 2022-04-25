@@ -31,4 +31,12 @@ describe('list-gifts-service', () => {
     const gifts = await sut.execute()
     expect(gifts).toEqual([fakeGift, fakeGift])
   })
+
+  it('should throw if repository throws', async () => {
+    const listGiftRepo = new ListGiftsRepositoryStub()
+    const sut = new ListGiftsService(listGiftRepo)
+    listGiftRepo.list = () => { throw new Error('repo error') }
+    const promise = sut.execute()
+    expect(promise).rejects.toThrow()
+  })
 }) 
