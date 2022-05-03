@@ -1,10 +1,14 @@
-import { DeleteGiftRepository } from "../../src/data/contracts"
+import { DeleteGiftRepository, FindGiftRepository } from "../../src/data/contracts"
 import { Gift } from "../../src/domain/entities"
-import { DeleteGift } from "../../src/domain/useCases"
+import { DeleteGift, FindGift } from "../../src/domain/useCases"
 
 class DeleteGiftService implements DeleteGift {
-  constructor(private readonly deleteGiftRepo: DeleteGiftRepository) { }
+  constructor(
+    private readonly deleteGiftRepo: DeleteGiftRepository,
+    private readonly findGiftRepo: FindGiftRepository
+  ) { }
   async execute(giftId: string): Promise<Gift> {
+    this.findGiftRepo.find(giftId)
     const deletedGift = await this.deleteGiftRepo.delete(giftId)
     return deletedGift
   }
@@ -16,6 +20,14 @@ const fakeGift: Gift = {
   price: 200.5,
   imageUrl: 'any_image_url',
   description: 'any_description'
+}
+
+class FindGiftRepositoryMock implements FindGiftRepository {
+  input: any
+  find(giftId: string): Promise<Gift> {
+    this.input = giftId
+    return null
+  }
 }
 
 class DeleteGiftRepositoryMock implements DeleteGiftRepository {
@@ -30,14 +42,17 @@ class DeleteGiftRepositoryMock implements DeleteGiftRepository {
 type SutTypes = {
   sut: DeleteGiftService,
   deleteGiftRepo: DeleteGiftRepositoryMock
+  findGiftRepo: FindGiftRepositoryMock
 }
 
 const makeSut = (): SutTypes => {
   const deleteGiftRepo = new DeleteGiftRepositoryMock()
-  const sut = new DeleteGiftService(deleteGiftRepo)
+  const findGiftRepo = new FindGiftRepositoryMock()
+  const sut = new DeleteGiftService(deleteGiftRepo, findGiftRepo)
   return {
     sut,
-    deleteGiftRepo
+    deleteGiftRepo,
+    findGiftRepo
   }
 }
 
@@ -60,5 +75,11 @@ describe('delete-gift', () => {
     deleteGiftRepo.output = fakeGift
     const deletedGift = await sut.execute('any_gift_id')
     expect(deletedGift).toEqual(fakeGift)
+  })
+
+  it('should call find repository with correct gift id', () => {
+    const { findGiftRepo, sut } = makeSut()
+    sut.execute('any_gift_id')
+    expect(findGiftRepo.input).toBe('any_gift_id')
   })
 })
