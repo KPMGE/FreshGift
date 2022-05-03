@@ -82,4 +82,11 @@ describe('delete-gift', () => {
     sut.execute('any_gift_id')
     expect(findGiftRepo.input).toBe('any_gift_id')
   })
+
+  it('should throw if findGiftRepository throws', () => {
+    const { findGiftRepo, sut } = makeSut()
+    findGiftRepo.find = () => { throw new Error('repo error') }
+    const promise = sut.execute('any_gift_id')
+    expect(promise).rejects.toThrowError(new Error('repo error'))
+  })
 })
