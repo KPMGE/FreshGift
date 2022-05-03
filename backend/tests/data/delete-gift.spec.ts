@@ -18,10 +18,23 @@ class DeleteGiftRepositoryMock implements DeleteGiftRepository {
   }
 }
 
+type SutTypes = {
+  sut: DeleteGiftService,
+  deleteGiftRepo: DeleteGiftRepositoryMock
+}
+
+const makeSut = (): SutTypes => {
+  const deleteGiftRepo = new DeleteGiftRepositoryMock()
+  const sut = new DeleteGiftService(deleteGiftRepo)
+  return {
+    sut,
+    deleteGiftRepo
+  }
+}
+
 describe('delete-gift', () => {
   it('should call repository with right gift id', () => {
-    const deleteGiftRepo = new DeleteGiftRepositoryMock()
-    const sut = new DeleteGiftService(deleteGiftRepo)
+    const { deleteGiftRepo, sut } = makeSut()
     sut.execute('any_gift_id')
     expect(deleteGiftRepo.input).toBe('any_gift_id')
   })
