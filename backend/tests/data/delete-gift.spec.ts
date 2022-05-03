@@ -38,4 +38,11 @@ describe('delete-gift', () => {
     sut.execute('any_gift_id')
     expect(deleteGiftRepo.input).toBe('any_gift_id')
   })
+
+  it('should throw if repository throws', () => {
+    const { deleteGiftRepo, sut } = makeSut()
+    deleteGiftRepo.delete = () => { throw new Error('repo error') }
+    const promise = sut.execute('any_gift_id')
+    expect(promise).rejects.toThrowError(new Error('repo error'))
+  })
 })
