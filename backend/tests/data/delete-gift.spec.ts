@@ -2,17 +2,6 @@ import { DeleteGiftRepository, FindGiftRepository } from "../../src/data/contrac
 import { Gift } from "../../src/domain/entities"
 import { DeleteGift, FindGift } from "../../src/domain/useCases"
 
-class DeleteGiftService implements DeleteGift {
-  constructor(
-    private readonly deleteGiftRepo: DeleteGiftRepository,
-    private readonly findGiftRepo: FindGiftRepository
-  ) { }
-  async execute(giftId: string): Promise<Gift> {
-    this.findGiftRepo.find(giftId)
-    const deletedGift = await this.deleteGiftRepo.delete(giftId)
-    return deletedGift
-  }
-}
 
 const fakeGift: Gift = {
   id: 'any_gift_id',
@@ -24,9 +13,10 @@ const fakeGift: Gift = {
 
 class FindGiftRepositoryMock implements FindGiftRepository {
   input: any
-  find(giftId: string): Promise<Gift> {
+  output = fakeGift
+  async find(giftId: string): Promise<Gift> {
     this.input = giftId
-    return null
+    return this.output
   }
 }
 
@@ -36,6 +26,18 @@ class DeleteGiftRepositoryMock implements DeleteGiftRepository {
   async delete(giftId: string): Promise<Gift> {
     this.input = giftId
     return this.output
+  }
+}
+class DeleteGiftService implements DeleteGift {
+  constructor(
+    private readonly deleteGiftRepo: DeleteGiftRepository,
+    private readonly findGiftRepo: FindGiftRepository
+  ) { }
+  async execute(giftId: string): Promise<Gift> {
+    const foundGift = await this.findGiftRepo.find(giftId)
+    if (!foundGift) throw new Error('gift not found')
+    const deletedGift = await this.deleteGiftRepo.delete(giftId)
+    return deletedGift
   }
 }
 
@@ -88,5 +90,12 @@ describe('delete-gift', () => {
     findGiftRepo.find = () => { throw new Error('repo error') }
     const promise = sut.execute('any_gift_id')
     expect(promise).rejects.toThrowError(new Error('repo error'))
+  })
+
+  it('should throw error if no gift was found', () => {
+    const { findGiftRepo, sut } = makeSut()
+    findGiftRepo.output = null
+    const promise = sut.execute('any_gift_id')
+    expect(promise).rejects.toThrowError(new Error('gift not found'))
   })
 })

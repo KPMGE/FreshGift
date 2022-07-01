@@ -2,21 +2,35 @@ import { CreateGift } from "../../src/domain/useCases"
 import { SaveGiftRepositorySpy } from "./mocks/save-gift-repository"
 import { IdGeneratorStub } from "./mocks/id-generator"
 import { CreateGiftService } from "../../src/data/services"
+import { Gift } from "../../src/domain/entities"
+import { makeFakeGift } from "../domain/mocks/gift"
+import { FindGiftByNameRepository } from "../../src/data/contracts/gift/find-gift-by-name"
+
+class FindGiftByNameRepositoryMock implements FindGiftByNameRepository {
+  name = ""
+  async find(name: string): Promise<Gift> {
+    this.name = name
+    return null
+  }
+}
 
 type SutTypes = {
   saveGiftRepo: SaveGiftRepositorySpy
   idGenerator: IdGeneratorStub,
+  findGiftRepo: FindGiftByNameRepositoryMock,
   sut: CreateGiftService
 }
 
 const makeSut = (): SutTypes => {
   const saveGiftRepo = new SaveGiftRepositorySpy()
   const idGenerator = new IdGeneratorStub()
-  const sut = new CreateGiftService(saveGiftRepo, idGenerator)
+  const findGiftRepo = new FindGiftByNameRepositoryMock()
+  const sut = new CreateGiftService(saveGiftRepo, idGenerator, findGiftRepo)
   return {
     saveGiftRepo,
     idGenerator,
-    sut
+    sut,
+    findGiftRepo
   }
 }
 
@@ -28,7 +42,24 @@ const fakeInput: CreateGift.Props = {
 }
 
 describe("create-gift", () => {
-  it("should call repository with right data", async () => {
+  it("should return error if gift name is already taken", async () => {
+    const { sut, findGiftRepo } = makeSut()
+    findGiftRepo.find = () => Promise.resolve(makeFakeGift())
+
+    const promise = sut.execute(fakeInput)
+
+    expect(promise).rejects.toThrowError(new Error('gift name already taken!'))
+  })
+
+
+  it("should call repository with right gift name", async () => {
+    const { sut, findGiftRepo } = makeSut()
+    await sut.execute(fakeInput)
+
+    expect(findGiftRepo.name).toEqual(fakeInput.name)
+  })
+
+  it("it should return error if gift name is already taken", async () => {
     const { saveGiftRepo, idGenerator, sut } = makeSut()
 
     await sut.execute(fakeInput)
