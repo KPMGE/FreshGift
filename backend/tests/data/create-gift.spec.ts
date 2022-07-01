@@ -2,17 +2,8 @@ import { CreateGift } from "../../src/domain/useCases"
 import { SaveGiftRepositorySpy } from "./mocks/save-gift-repository"
 import { IdGeneratorStub } from "./mocks/id-generator"
 import { CreateGiftService } from "../../src/data/services"
-import { Gift } from "../../src/domain/entities"
 import { makeFakeGift } from "../domain/mocks/gift"
-import { FindGiftByNameRepository } from "../../src/data/contracts/gift/find-gift-by-name"
-
-class FindGiftByNameRepositoryMock implements FindGiftByNameRepository {
-  name = ""
-  async find(name: string): Promise<Gift> {
-    this.name = name
-    return null
-  }
-}
+import { FindGiftByNameRepositoryMock } from "./mocks/find-gift-by-name"
 
 type SutTypes = {
   saveGiftRepo: SaveGiftRepositorySpy
@@ -50,7 +41,6 @@ describe("create-gift", () => {
 
     expect(promise).rejects.toThrowError(new Error('gift name already taken!'))
   })
-
 
   it("should call repository with right gift name", async () => {
     const { sut, findGiftRepo } = makeSut()
