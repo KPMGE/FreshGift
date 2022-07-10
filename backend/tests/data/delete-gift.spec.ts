@@ -1,23 +1,9 @@
-import { DeleteGiftRepository, FindGiftByIdRepository } from "../../src/data/contracts"
 import { GiftNotFoundError } from "../../src/data/errors"
-import { Gift } from "../../src/domain/entities"
-import { DeleteGift } from "../../src/domain/useCases"
+import { DeleteGiftService } from "../../src/data/services/gift/delete-gift"
 import { makeFakeGift } from "../domain/mocks/gift"
 import { DeleteGiftRepositoryMock } from "./mocks/delete-gift"
 import { FindGiftByIdRepositoryMock } from "./mocks/find-gift-by-id"
 
-class DeleteGiftService implements DeleteGift {
-  constructor(
-    private readonly deleteGiftRepo: DeleteGiftRepository,
-    private readonly findGiftRepo: FindGiftByIdRepository
-  ) { }
-  async execute(giftId: string): Promise<Gift> {
-    const foundGift = await this.findGiftRepo.find(giftId)
-    if (!foundGift) throw new GiftNotFoundError()
-    const deletedGift = await this.deleteGiftRepo.delete(giftId)
-    return deletedGift
-  }
-}
 
 type SutTypes = {
   sut: DeleteGiftService,
