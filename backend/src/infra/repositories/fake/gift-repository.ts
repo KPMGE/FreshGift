@@ -1,5 +1,10 @@
-import { DeleteGiftRepository, ListGiftRepository, SaveGiftRepository, UpdateGiftRepository } from '../../../data/contracts/gift'
-import { GetGiftByIdRepository } from '../../../data/contracts/gift/get-gift-by-id-repository'
+import {
+  DeleteGiftRepository,
+  ListGiftRepository,
+  SaveGiftRepository,
+  UpdateGiftRepository,
+  FindGiftByNameRepository
+} from '../../../data/contracts/gift'
 import { GiftDTO } from '../../../data/DTO'
 import { Gift } from '../../../domain/entities'
 import { UpdateGift } from '../../../domain/useCases/gift'
@@ -30,11 +35,17 @@ export class FakeListGiftRepository implements ListGiftRepository {
   }
 }
 
-export class FakeGetGiftByIdRepository implements GetGiftByIdRepository {
-  async getGift(giftId: string): Promise<GiftDTO | undefined> {
-    return listGifts.find(gift => gift.id === giftId)
+export class FakeFindGiftByNameRepository implements FindGiftByNameRepository {
+  async find(name: string): Promise<Gift> {
+    return listGifts.find(gift => gift.name === name)
   }
 }
+
+// export class FakeGetGiftByIdRepository implements GetGiftByIdRepository {
+//   async getGift(giftId: string): Promise<GiftDTO | undefined> {
+//     return listGifts.find(gift => gift.id === giftId)
+//   }
+// }
 
 export class FakeUpdateGiftRepository implements UpdateGiftRepository {
   async update(giftId?: string, newGift?: UpdateGift.Props): Promise<GiftDTO | undefined> {
