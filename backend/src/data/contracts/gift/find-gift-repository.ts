@@ -1,5 +1,5 @@
 import { GiftDTO } from "../../DTO";
 
-export interface FindGiftRepository {
+export interface FindGiftByIdRepository {
   find(giftId: string): Promise<GiftDTO>
 }

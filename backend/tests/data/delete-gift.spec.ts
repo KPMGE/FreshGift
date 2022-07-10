@@ -1,16 +1,8 @@
-import { DeleteGiftRepository, FindGiftRepository } from "../../src/data/contracts"
+import { DeleteGiftRepository, FindGiftByIdRepository } from "../../src/data/contracts"
 import { Gift } from "../../src/domain/entities"
 import { DeleteGift } from "../../src/domain/useCases"
 import { makeFakeGift } from "../domain/mocks/gift"
-
-class FindGiftRepositoryMock implements FindGiftRepository {
-  input: any
-  output = makeFakeGift()
-  async find(giftId: string): Promise<Gift> {
-    this.input = giftId
-    return this.output
-  }
-}
+import { FindGiftByIdRepositoryMock } from "./mocks/find-gift-by-id"
 
 class DeleteGiftRepositoryMock implements DeleteGiftRepository {
   input = ""
@@ -31,7 +23,7 @@ class GiftNotFoundError extends Error {
 class DeleteGiftService implements DeleteGift {
   constructor(
     private readonly deleteGiftRepo: DeleteGiftRepository,
-    private readonly findGiftRepo: FindGiftRepository
+    private readonly findGiftRepo: FindGiftByIdRepository
   ) { }
   async execute(giftId: string): Promise<Gift> {
     const foundGift = await this.findGiftRepo.find(giftId)
@@ -44,12 +36,12 @@ class DeleteGiftService implements DeleteGift {
 type SutTypes = {
   sut: DeleteGiftService,
   deleteGiftRepo: DeleteGiftRepositoryMock
-  findGiftRepo: FindGiftRepositoryMock
+  findGiftRepo: FindGiftByIdRepositoryMock
 }
 
 const makeSut = (): SutTypes => {
   const deleteGiftRepo = new DeleteGiftRepositoryMock()
-  const findGiftRepo = new FindGiftRepositoryMock()
+  const findGiftRepo = new FindGiftByIdRepositoryMock()
   const sut = new DeleteGiftService(deleteGiftRepo, findGiftRepo)
   return {
     sut,
