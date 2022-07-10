@@ -62,6 +62,14 @@ describe('delete-gift-controller', () => {
     expect(service.giftId).toEqual('any_gift_id')
   })
 
+  it('should call validator with right data', async () => {
+    const { validator, sut } = makeSut()
+
+    await sut.handle({ giftId: 'any_gift_id' })
+
+    expect(validator.input).toEqual({ giftId: 'any_gift_id' })
+  })
+
   it('should return badRequest if service returns GiftNotFoundError', async () => {
     const { service, sut } = makeSut()
     service.execute = () => { throw new GiftNotFoundError() }
