@@ -3,13 +3,15 @@ import { Gift } from "../../../src/domain/entities"
 import { DeleteGift } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
 import { ServerError } from "../../../src/presentation/errors"
-import { badRequest, serverError } from "../../../src/presentation/helpers"
+import { badRequest, ok, serverError } from "../../../src/presentation/helpers"
+import { makeFakeGift } from "../../domain/mocks/gift"
 
-class DeleteGiftServiceMock implements DeleteGift {
+class DeleteGiftServiceSpy implements DeleteGift {
   giftId = ""
-  execute(giftId: string): Promise<Gift> {
+  deletedGift = makeFakeGift()
+  async execute(giftId: string): Promise<Gift> {
     this.giftId = giftId
-    return null
+    return this.deletedGift
   }
 }
 
@@ -20,7 +22,8 @@ class DeleteGiftController implements Controller {
     const giftId = request.giftId
 
     try {
-      this.deleteGiftService.execute(giftId)
+      const deletedGift = await this.deleteGiftService.execute(giftId)
+      return ok(deletedGift)
     } catch (error) {
       if (error instanceof GiftNotFoundError) return badRequest(error)
       return serverError(error)
@@ -30,11 +33,11 @@ class DeleteGiftController implements Controller {
 
 type SutTypes = {
   sut: DeleteGiftController,
-  service: DeleteGiftServiceMock
+  service: DeleteGiftServiceSpy
 }
 
 const makeSut = (): SutTypes => {
-  const service = new DeleteGiftServiceMock()
+  const service = new DeleteGiftServiceSpy()
   const sut = new DeleteGiftController(service)
   return {
     sut,
@@ -68,5 +71,14 @@ describe('delete-gift-controller', () => {
 
     expect(httpResponse.statusCode).toBe(500)
     expect(httpResponse.body).toEqual(new ServerError('some strange error'))
+  })
+
+  it('should return deleted gift on success', async () => {
+    const { service, sut } = makeSut()
+
+    const httpResponse = await sut.handle({ giftId: 'any_gift_id' })
+
+    expect(httpResponse.statusCode).toBe(200)
+    expect(httpResponse.body).toEqual(makeFakeGift())
   })
 })
