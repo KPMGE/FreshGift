@@ -1,31 +1,9 @@
 import { GiftNotFoundError } from "../../../src/data/errors"
-import { DeleteGift } from "../../../src/domain/useCases"
-import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
+import { DeleteGiftController } from "../../../src/presentation/controllers/gift/delete-gift"
 import { ServerError } from "../../../src/presentation/errors"
-import { badRequest, ok, serverError } from "../../../src/presentation/helpers"
 import { makeFakeGift } from "../../domain/mocks/gift"
 import { ValidatorSpy } from "./mocks"
 import { DeleteGiftServiceSpy } from "./mocks/delete-gift"
-
-class DeleteGiftController implements Controller {
-  constructor(
-    private readonly deleteGiftService: DeleteGift,
-    private readonly validator: Validator
-  ) { }
-
-  async handle(request: any): Promise<HttpResponse> {
-    const error = this.validator.validate(request)
-    if (error) return badRequest(error)
-
-    try {
-      const deletedGift = await this.deleteGiftService.execute(request.giftId)
-      return ok(deletedGift)
-    } catch (error) {
-      if (error instanceof GiftNotFoundError) return badRequest(error)
-      return serverError(error)
-    }
-  }
-}
 
 type SutTypes = {
   sut: DeleteGiftController,
