@@ -50,6 +50,14 @@ describe('create-gift-controller', () => {
     expect(httpResponse.body).toEqual(createGiftService.output)
   })
 
+  it('should return badRequest if createGiftService returns GiftNameTaken error', async () => {
+    const { sut, createGiftService } = makeSut()
+    const httpResponse = await sut.handle(fakeRequest)
+    expect(httpResponse.statusCode).toBe(201)
+    expect(httpResponse.body).toEqual(createGiftService.output)
+  })
+
+
   it('should return serverError if createGiftService throws', async () => {
     const { sut, createGiftService } = makeSut()
     createGiftService.execute = () => { throw new Error('service error') }

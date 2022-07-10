@@ -3,19 +3,20 @@ import { SaveGiftRepositorySpy } from "./mocks/save-gift-repository"
 import { IdGeneratorStub } from "./mocks/id-generator"
 import { CreateGiftService } from "../../src/data/services"
 import { makeFakeGift } from "../domain/mocks/gift"
-import { FindGiftByNameRepositoryMock } from "./mocks/find-gift-by-name"
+import { FindGiftByNameRepositorySpy } from "./mocks/find-gift-by-name"
+import { GiftNameTakenError } from "../../src/data/errors"
 
 type SutTypes = {
   saveGiftRepo: SaveGiftRepositorySpy
   idGenerator: IdGeneratorStub,
-  findGiftRepo: FindGiftByNameRepositoryMock,
+  findGiftRepo: FindGiftByNameRepositorySpy,
   sut: CreateGiftService
 }
 
 const makeSut = (): SutTypes => {
   const saveGiftRepo = new SaveGiftRepositorySpy()
   const idGenerator = new IdGeneratorStub()
-  const findGiftRepo = new FindGiftByNameRepositoryMock()
+  const findGiftRepo = new FindGiftByNameRepositorySpy()
   const sut = new CreateGiftService(saveGiftRepo, idGenerator, findGiftRepo)
   return {
     saveGiftRepo,
@@ -49,12 +50,13 @@ describe("create-gift", () => {
     expect(findGiftRepo.name).toEqual(fakeInput.name)
   })
 
-  it("it should return error if gift name is already taken", async () => {
-    const { saveGiftRepo, idGenerator, sut } = makeSut()
+  it("it should return GiftNameTakenError if gift name is already taken", async () => {
+    const { sut, findGiftRepo } = makeSut()
+    findGiftRepo.gift = makeFakeGift()
 
-    await sut.execute(fakeInput)
+    const promise = sut.execute(fakeInput)
 
-    expect(saveGiftRepo.input).toEqual({ ...fakeInput, id: idGenerator.output })
+    expect(promise).rejects.toThrowError(new GiftNameTakenError())
   })
 
   it("should throw if repository throws", async () => {
