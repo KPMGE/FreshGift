@@ -1,20 +1,11 @@
 import { GiftNotFoundError } from "../../../src/data/errors"
-import { Gift } from "../../../src/domain/entities"
 import { DeleteGift } from "../../../src/domain/useCases"
 import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { ServerError } from "../../../src/presentation/errors"
 import { badRequest, ok, serverError } from "../../../src/presentation/helpers"
 import { makeFakeGift } from "../../domain/mocks/gift"
 import { ValidatorSpy } from "./mocks"
-
-class DeleteGiftServiceSpy implements DeleteGift {
-  giftId = ""
-  deletedGift = makeFakeGift()
-  async execute(giftId: string): Promise<Gift> {
-    this.giftId = giftId
-    return this.deletedGift
-  }
-}
+import { DeleteGiftServiceSpy } from "./mocks/delete-gift"
 
 class DeleteGiftController implements Controller {
   constructor(
