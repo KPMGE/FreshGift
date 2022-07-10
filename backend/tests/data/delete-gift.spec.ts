@@ -2,16 +2,8 @@ import { DeleteGiftRepository, FindGiftByIdRepository } from "../../src/data/con
 import { Gift } from "../../src/domain/entities"
 import { DeleteGift } from "../../src/domain/useCases"
 import { makeFakeGift } from "../domain/mocks/gift"
+import { DeleteGiftRepositoryMock } from "./mocks/delete-gift"
 import { FindGiftByIdRepositoryMock } from "./mocks/find-gift-by-id"
-
-class DeleteGiftRepositoryMock implements DeleteGiftRepository {
-  input = ""
-  output = makeFakeGift()
-  async delete(giftId: string): Promise<Gift> {
-    this.input = giftId
-    return this.output
-  }
-}
 
 class GiftNotFoundError extends Error {
   constructor() {
