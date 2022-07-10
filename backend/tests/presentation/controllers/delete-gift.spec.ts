@@ -1,6 +1,8 @@
+import { GiftNotFoundError } from "../../../src/data/errors"
 import { Gift } from "../../../src/domain/entities"
 import { DeleteGift } from "../../../src/domain/useCases"
 import { Controller, HttpResponse } from "../../../src/presentation/contracts"
+import { badRequest } from "../../../src/presentation/helpers"
 
 class DeleteGiftServiceMock implements DeleteGift {
   giftId = ""
@@ -15,8 +17,13 @@ class DeleteGiftController implements Controller {
 
   async handle(request: any): Promise<HttpResponse> {
     const giftId = request.giftId
-    this.deleteGiftService.execute(giftId)
-    return null
+
+    try {
+      this.deleteGiftService.execute(giftId)
+    } catch (error) {
+      if (error instanceof GiftNotFoundError) return badRequest(error)
+      return null
+    }
   }
 }
 
@@ -28,5 +35,16 @@ describe('delete-gift-controller', () => {
     await sut.handle({ giftId: 'any_gift_id' })
 
     expect(service.giftId).toEqual('any_gift_id')
+  })
+
+  it('should return badRequest if service returns GiftNotFoundError', async () => {
+    const service = new DeleteGiftServiceMock()
+    const sut = new DeleteGiftController(service)
+    service.execute = () => { throw new GiftNotFoundError() }
+
+    const httpResponse = await sut.handle({ giftId: 'any_gift_id' })
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new GiftNotFoundError())
   })
 })
