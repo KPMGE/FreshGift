@@ -27,19 +27,30 @@ class DeleteGiftController implements Controller {
   }
 }
 
+type SutTypes = {
+  sut: DeleteGiftController,
+  service: DeleteGiftServiceMock
+}
+
+const makeSut = (): SutTypes => {
+  const service = new DeleteGiftServiceMock()
+  const sut = new DeleteGiftController(service)
+  return {
+    sut,
+    service
+  }
+}
+
 describe('delete-gift-controller', () => {
   it('should call service with right giftId', async () => {
-    const service = new DeleteGiftServiceMock()
-    const sut = new DeleteGiftController(service)
-
+    const { service, sut } = makeSut()
     await sut.handle({ giftId: 'any_gift_id' })
 
     expect(service.giftId).toEqual('any_gift_id')
   })
 
   it('should return badRequest if service returns GiftNotFoundError', async () => {
-    const service = new DeleteGiftServiceMock()
-    const sut = new DeleteGiftController(service)
+    const { service, sut } = makeSut()
     service.execute = () => { throw new GiftNotFoundError() }
 
     const httpResponse = await sut.handle({ giftId: 'any_gift_id' })
