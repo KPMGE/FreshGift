@@ -2,21 +2,27 @@ import { CreateGift } from "../../src/domain/useCases"
 import { SaveGiftRepositorySpy } from "./mocks/save-gift-repository"
 import { IdGeneratorStub } from "./mocks/id-generator"
 import { CreateGiftService } from "../../src/data/services"
+import { makeFakeGift } from "../domain/mocks/gift"
+import { FindGiftByNameRepositorySpy } from "./mocks/find-gift-by-name"
+import { GiftNameTakenError } from "../../src/data/errors"
 
 type SutTypes = {
   saveGiftRepo: SaveGiftRepositorySpy
   idGenerator: IdGeneratorStub,
+  findGiftRepo: FindGiftByNameRepositorySpy,
   sut: CreateGiftService
 }
 
 const makeSut = (): SutTypes => {
   const saveGiftRepo = new SaveGiftRepositorySpy()
   const idGenerator = new IdGeneratorStub()
-  const sut = new CreateGiftService(saveGiftRepo, idGenerator)
+  const findGiftRepo = new FindGiftByNameRepositorySpy()
+  const sut = new CreateGiftService(saveGiftRepo, idGenerator, findGiftRepo)
   return {
     saveGiftRepo,
     idGenerator,
-    sut
+    sut,
+    findGiftRepo
   }
 }
 
@@ -28,12 +34,29 @@ const fakeInput: CreateGift.Props = {
 }
 
 describe("create-gift", () => {
-  it("should call repository with right data", async () => {
-    const { saveGiftRepo, idGenerator, sut } = makeSut()
+  it("should return error if gift name is already taken", async () => {
+    const { sut, findGiftRepo } = makeSut()
+    findGiftRepo.find = () => Promise.resolve(makeFakeGift())
 
+    const promise = sut.execute(fakeInput)
+
+    expect(promise).rejects.toThrowError(new Error('gift name already taken!'))
+  })
+
+  it("should call repository with right gift name", async () => {
+    const { sut, findGiftRepo } = makeSut()
     await sut.execute(fakeInput)
 
-    expect(saveGiftRepo.input).toEqual({ ...fakeInput, id: idGenerator.output })
+    expect(findGiftRepo.name).toEqual(fakeInput.name)
+  })
+
+  it("it should return GiftNameTakenError if gift name is already taken", async () => {
+    const { sut, findGiftRepo } = makeSut()
+    findGiftRepo.gift = makeFakeGift()
+
+    const promise = sut.execute(fakeInput)
+
+    expect(promise).rejects.toThrowError(new GiftNameTakenError())
   })
 
   it("should throw if repository throws", async () => {
