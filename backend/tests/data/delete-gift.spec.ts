@@ -1,16 +1,10 @@
 import { DeleteGiftRepository, FindGiftByIdRepository } from "../../src/data/contracts"
+import { GiftNotFoundError } from "../../src/data/errors"
 import { Gift } from "../../src/domain/entities"
 import { DeleteGift } from "../../src/domain/useCases"
 import { makeFakeGift } from "../domain/mocks/gift"
 import { DeleteGiftRepositoryMock } from "./mocks/delete-gift"
 import { FindGiftByIdRepositoryMock } from "./mocks/find-gift-by-id"
-
-class GiftNotFoundError extends Error {
-  constructor() {
-    super('gift not found!')
-    super.name = 'GiftNotFoundError'
-  }
-}
 
 class DeleteGiftService implements DeleteGift {
   constructor(
