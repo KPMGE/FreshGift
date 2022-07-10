@@ -1,10 +1,11 @@
 import { GiftNotFoundError } from "../../../src/data/errors"
 import { Gift } from "../../../src/domain/entities"
 import { DeleteGift } from "../../../src/domain/useCases"
-import { Controller, HttpResponse } from "../../../src/presentation/contracts"
+import { Controller, HttpResponse, Validator } from "../../../src/presentation/contracts"
 import { ServerError } from "../../../src/presentation/errors"
 import { badRequest, ok, serverError } from "../../../src/presentation/helpers"
 import { makeFakeGift } from "../../domain/mocks/gift"
+import { ValidatorSpy } from "./mocks"
 
 class DeleteGiftServiceSpy implements DeleteGift {
   giftId = ""
@@ -16,13 +17,17 @@ class DeleteGiftServiceSpy implements DeleteGift {
 }
 
 class DeleteGiftController implements Controller {
-  constructor(private readonly deleteGiftService: DeleteGift) { }
+  constructor(
+    private readonly deleteGiftService: DeleteGift,
+    private readonly validator: Validator
+  ) { }
 
   async handle(request: any): Promise<HttpResponse> {
-    const giftId = request.giftId
+    const error = this.validator.validate(request)
+    if (error) return badRequest(error)
 
     try {
-      const deletedGift = await this.deleteGiftService.execute(giftId)
+      const deletedGift = await this.deleteGiftService.execute(request.giftId)
       return ok(deletedGift)
     } catch (error) {
       if (error instanceof GiftNotFoundError) return badRequest(error)
@@ -33,15 +38,19 @@ class DeleteGiftController implements Controller {
 
 type SutTypes = {
   sut: DeleteGiftController,
-  service: DeleteGiftServiceSpy
+  service: DeleteGiftServiceSpy,
+  validator: ValidatorSpy
 }
 
 const makeSut = (): SutTypes => {
   const service = new DeleteGiftServiceSpy()
-  const sut = new DeleteGiftController(service)
+  const validator = new ValidatorSpy()
+  const sut = new DeleteGiftController(service, validator)
+
   return {
     sut,
-    service
+    service,
+    validator
   }
 }
 
@@ -63,6 +72,16 @@ describe('delete-gift-controller', () => {
     expect(httpResponse.body).toEqual(new GiftNotFoundError())
   })
 
+  it('should return badRequest if validator returns error', async () => {
+    const { validator, sut } = makeSut()
+    validator.validate = () => { return new Error('validation error') }
+
+    const httpResponse = await sut.handle({ giftId: 'any_gift_id' })
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new Error('validation error'))
+  })
+
   it('should return serverError if service returns error', async () => {
     const { service, sut } = makeSut()
     service.execute = () => { throw new Error('some strange error') }
@@ -74,7 +93,7 @@ describe('delete-gift-controller', () => {
   })
 
   it('should return deleted gift on success', async () => {
-    const { service, sut } = makeSut()
+    const { sut } = makeSut()
 
     const httpResponse = await sut.handle({ giftId: 'any_gift_id' })
 
