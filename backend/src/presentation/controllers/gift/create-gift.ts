@@ -1,3 +1,4 @@
+import { GiftNameTakenError } from "../../../data/errors";
 import { CreateGift } from "../../../domain/useCases";
 import { Controller, HttpResponse, Validator } from "../../contracts";
 import { badRequest, created, serverError } from "../../helpers";
@@ -21,6 +22,7 @@ export class CreateGiftController implements Controller {
       const createdGift = await this.createGiftService.execute(request)
       return created(createdGift)
     } catch (err) {
+      if (err instanceof GiftNameTakenError) return badRequest(err)
       return serverError(err)
     }
   }

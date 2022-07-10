@@ -1,3 +1,4 @@
+import { GiftNameTakenError } from "../../../src/data/errors";
 import { CreateGiftController } from "../../../src/presentation/controllers/gift/create-gift";
 import { ServerError } from "../../../src/presentation/errors";
 import { ValidatorSpy } from "./mocks";
@@ -52,9 +53,12 @@ describe('create-gift-controller', () => {
 
   it('should return badRequest if createGiftService returns GiftNameTaken error', async () => {
     const { sut, createGiftService } = makeSut()
+    createGiftService.execute = () => { throw new GiftNameTakenError() }
+
     const httpResponse = await sut.handle(fakeRequest)
-    expect(httpResponse.statusCode).toBe(201)
-    expect(httpResponse.body).toEqual(createGiftService.output)
+
+    expect(httpResponse.statusCode).toBe(400)
+    expect(httpResponse.body).toEqual(new GiftNameTakenError())
   })
 
 
